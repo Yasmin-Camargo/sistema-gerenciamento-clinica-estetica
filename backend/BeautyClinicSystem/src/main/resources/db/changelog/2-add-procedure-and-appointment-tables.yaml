@@ -1,0 +1,107 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-person-client-and-esthetician-tables
+      author: yasmin
+      changes:
+        - createTable:
+            tableName: procedure
+            columns:
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: estimated_duration
+                  type: INT
+              - column:
+                  name: cost
+                  type: DECIMAL(10,2)
+
+        - createTable:
+            tableName: appointment
+            columns:
+              - column:
+                  name: esthetician_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_time
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: clinical_notes
+                  type: VARCHAR(1000)
+              - column:
+                  name: value
+                  type: DECIMAL(10,2)
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: SCHEDULED
+        - addPrimaryKey:
+            tableName: appointment
+            columnNames: esthetician_cpf, client_cpf, date_time
+            constraintName: pk_appointment
+        - addForeignKeyConstraint:
+            baseTableName: appointment
+            baseColumnNames: esthetician_cpf
+            referencedTableName: esthetician
+            referencedColumnNames: cpf
+            constraintName: fk_appointment_esthetician
+        - addForeignKeyConstraint:
+            baseTableName: appointment
+            baseColumnNames: client_cpf
+            referencedTableName: client
+            referencedColumnNames: cpf
+            constraintName: fk_appointment_client
+
+        - createTable:
+            tableName: appointment_procedure
+            columns:
+              - column:
+                  name: esthetician_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_time
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: procedure_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: appointment_procedure
+            baseColumnNames: esthetician_cpf, client_cpf, date_time
+            referencedTableName: appointment
+            referencedColumnNames: esthetician_cpf, client_cpf, date_time
+            constraintName: fk_appointment_procedure_appointment
+        - addForeignKeyConstraint:
+            baseTableName: appointment_procedure
+            baseColumnNames: procedure_name
+            referencedTableName: procedure
+            referencedColumnNames: name
+            constraintName: fk_appointment_procedure_procedure
+
+
+

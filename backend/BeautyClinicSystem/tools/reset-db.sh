@@ -17,12 +17,5 @@ echo "🧹 Dropping all tables..."
   -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.yaml \
   -Dliquibase.driver=org.postgresql.Driver
 
-./mvnw liquibase:update \
-   -Dliquibase.url=jdbc:postgresql://localhost:5432/beauty-clinic-system-api \
-   -Dliquibase.username=${DB_USERNAME} \
-   -Dliquibase.password=${DB_PASSWORD} \
-   -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.yaml \
-   -Dliquibase.driver=org.postgresql.Driver
-
 
 echo "✅ Database reset complete."
