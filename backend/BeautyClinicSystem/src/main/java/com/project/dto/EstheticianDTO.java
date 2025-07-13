@@ -10,6 +10,7 @@ public record EstheticianDTO(
         String email,
         String address,
         String professionalRegistrationNumber,
-        String specializations
+        String specializations,
+        String password
 ) {
 }

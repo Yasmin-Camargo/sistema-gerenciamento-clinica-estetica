@@ -25,7 +25,7 @@ public abstract class Person {
 
     private LocalDate birthDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String address;
