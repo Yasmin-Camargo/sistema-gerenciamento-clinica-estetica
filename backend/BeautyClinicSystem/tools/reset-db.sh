@@ -11,7 +11,7 @@ fi
 
 echo "🧹 Dropping all tables..."
 ./mvnw liquibase:dropAll \
-  -Dliquibase.url=jdbc:postgresql://localhost:5432/beauty-clinic-system-api \
+  -Dliquibase.url=jdbc:postgresql://localhost:5433/beauty-clinic-system-api \
   -Dliquibase.username=${DB_USERNAME} \
   -Dliquibase.password=${DB_PASSWORD} \
   -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.yaml \
