@@ -41,10 +41,8 @@ export const StandardPage: React.FC<StandardPageProps> = ({
         </div>
 
         <div className="content">
-          {/* filtros opcionais */}
           {filters && <div className="filters">{filters}</div>}
 
-          {/* conteúdo principal */}
           {children}
         </div>
       </Content>

@@ -71,6 +71,7 @@ export const Content = styled.div<ContentProps>`
   border-radius: 8px;   
   overflow: hidden;           
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.05); 
+  margin-bottom: 1.5rem;
 }
 
 .table th,

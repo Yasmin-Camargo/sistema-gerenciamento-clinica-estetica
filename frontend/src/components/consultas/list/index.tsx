@@ -3,7 +3,7 @@ import { StandardPage } from '../../listPadrao';
 import { ConsultaStyles } from './styles';
 
 
-interface Consulta {
+export interface Consulta {
   data: string;    
   cliente: string;
   status: 'Pendente' | 'Concluída' | 'Cancelada';

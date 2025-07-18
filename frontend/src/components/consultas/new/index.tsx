@@ -7,7 +7,6 @@ export const NewConsultasPage: React.FC = () => {
 
   const handleSalvar = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Consulta salva!');
     navigate('/consultas'); // volta para lista se quiser
   };
 
