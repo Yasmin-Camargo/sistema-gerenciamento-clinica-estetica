@@ -4,6 +4,30 @@ export const ConsultaStyles = styled.div`
   .status {
     font-weight: 600;
   }
+
+  .action-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* espaçamento entre os botões */
+}
+
+.action-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+
+  img {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
   .status.pendente {
     color: #c87624;
   }

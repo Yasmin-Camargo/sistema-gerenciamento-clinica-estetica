@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SidebarContainer } from './styles';
 
 interface SidebarProps {
@@ -7,16 +8,17 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
-  const base = process.env.PUBLIC_URL; // pasta /public
+  const navigate = useNavigate();
+  const base = process.env.PUBLIC_URL;
 
   const items = [
-    { label: 'Início',            icon: `${base}/logo_inicio.png` },
-    { label: 'Consultas',         icon: `${base}/logo_consulta.png` },
-    { label: 'Clientes',          icon: `${base}/logo_clientes.png` },
-    { label: 'Produtos',          icon: `${base}/logo_produtos.png` },
-    { label: 'Procedimentos',     icon: `${base}/logo_procedimentos.png` },
-    { label: 'Configurações',     icon: `${base}/logo_configuracoes.png` },
-    { label: 'Sair',              icon: `${base}/logo_sair.png` },
+    { label: 'Início',            icon: `${base}/logo_inicio.png`,        path: '/home' },
+    { label: 'Consultas',         icon: `${base}/logo_consulta.png`,      path: '/consultas' },
+    { label: 'Clientes',          icon: `${base}/logo_clientes.png`,      path: '/clientes' },
+    { label: 'Produtos',          icon: `${base}/logo_produtos.png`,      path: '/produtos' },
+    { label: 'Procedimentos',     icon: `${base}/logo_procedimentos.png`, path: '/procedimentos' },
+    { label: 'Configurações',     icon: `${base}/logo_configuracoes.png`, path: '/configuracoes' },
+    { label: 'Sair',              icon: `${base}/logo_sair.png`,          path: '/logout' },
   ];
 
   return (
@@ -25,8 +27,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
         {open ? '←' : '→'}
       </button>
 
-      {items.map(({ label, icon }) => (
-        <div className="menuItem" key={label}>
+      {items.map(({ label, icon, path }) => (
+        <div
+          className="menuItem"
+          key={label}
+          onClick={() => navigate(path)}
+          style={{ cursor: 'pointer' }}
+        >
           <img src={icon} alt={label} className="icon" />
           <span className="menuLabel">{label}</span>
         </div>

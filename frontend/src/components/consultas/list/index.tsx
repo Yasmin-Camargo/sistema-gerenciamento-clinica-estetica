@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { StandardPage } from '../../listPadrao';  
 import { ConsultaStyles } from './styles';
-
+import { useNavigate } from 'react-router-dom';
+import { RemoveModal } from '../../removeModal';
 
 export interface Consulta {
   data: string;    
@@ -29,10 +30,26 @@ export const ConsultasPage: React.FC = () => {
     },
   ];
 
+  const navigate = useNavigate();
   const [busca, setBusca] = useState('');
   const [dataFiltro, setDataFiltro] = useState('');
   const [procedimentoFiltro, setProcedimentoFiltro] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
+  const [modalAberto, setModalAberto] = useState(false);
+  const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(null);
+
+const excluirConsulta = (consulta: Consulta) => {
+  setConsultaSelecionada(consulta);
+  setModalAberto(true);
+};
+
+const confirmarRemocao = () => {
+  if (consultaSelecionada) {
+    // Aqui você pode fazer a lógica de remover (ex: via API)
+    console.log('Remover:', consultaSelecionada);
+  }
+  setModalAberto(false);
+};
 
   const consultasFiltradas = useMemo(() => {
     return consultas.filter((c) => {
@@ -79,13 +96,15 @@ export const ConsultasPage: React.FC = () => {
     </div>
   );
 
-  const handleNovaConsulta = () => alert('Ir para formulário de Nova Consulta');
+  const navigateNovaConsulta = () => {
+    navigate('/consultas/new');
+  };
 
   return (
     <StandardPage
       title="Consultas"
       buttonLabel="Nova Consulta"
-      onButtonClick={handleNovaConsulta}
+      onButtonClick={navigateNovaConsulta}
       filters={filtros}
     >
       <ConsultaStyles>
@@ -107,6 +126,14 @@ export const ConsultasPage: React.FC = () => {
                 <td className={`status ${c.status.toLowerCase()}`}>{c.status}</td>
                 <td>{c.procedimentos}</td>
                 <td>{c.valor}</td>
+                <td className="action-cell">
+                  <button className="action-button">
+                    <img src="/IconEdit.png" alt="Editar" />
+                  </button>
+                  <button onClick={() => excluirConsulta(c)} className="action-button">
+                    <img src="/IconLixo.png" alt="Excluir" />
+                  </button>
+                </td>
               </tr>
             ))}
             {consultasFiltradas.length === 0 && (
@@ -114,9 +141,19 @@ export const ConsultasPage: React.FC = () => {
                 <td colSpan={5}>Nenhuma consulta encontrada.</td>
               </tr>
             )}
+            
           </tbody>
         </table>
       </ConsultaStyles>
+
+      <RemoveModal
+        isOpen={modalAberto}
+        onClose={() => setModalAberto(false)}
+        onConfirm={confirmarRemocao}
+        title="Excluir consulta"
+        message={`Tem certeza que deseja excluir a consulta de ${consultaSelecionada?.cliente}?`}
+      />
+
     </StandardPage>
   );
 };
