@@ -43,7 +43,7 @@ public class Appointment {
                     @JoinColumn(name = "client_cpf", referencedColumnName = "client_cpf"),
                     @JoinColumn(name = "date_time", referencedColumnName = "date_time")
             },
-            inverseJoinColumns = @JoinColumn(name = "procedure_id")
+            inverseJoinColumns = @JoinColumn(name = "procedure_name")
     )
     private List<Procedure> procedures;
 }
