@@ -66,7 +66,12 @@ public class AppointmentService {
         Esthetician esthetician = estheticianRepository.findById(dto.esthetician().cpf())
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "esthetician-not-found"));
 
-        List<Procedure> procedures = procedureRepository.findAllById(dto.proceduresName());
+        List<String> procedureNames = dto.proceduresName();
+        List<Procedure> procedures = procedureRepository.findAllById(procedureNames);
+
+        if (procedures.size() != procedureNames.size()) {
+            throw new ResponseStatusException(BAD_REQUEST, "one-or-more-procedures-not-found");
+        }
 
         Appointment appointment = AppointmentMapper.fromDtoToEntity(dto, client, esthetician, procedures);
         appointmentRepository.save(appointment);
