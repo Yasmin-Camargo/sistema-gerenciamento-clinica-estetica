@@ -1,12 +1,15 @@
 package com.project.resources;
 
 import com.project.dto.AppointmentDTO;
+import com.project.models.AppointmentStatus;
 import com.project.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,6 +23,17 @@ public class AppointmentResource {
     public ResponseEntity<List<AppointmentDTO>> listAll() {
         return ResponseEntity.ok(appointmentService.listAll());
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<AppointmentDTO>> filterAppointments(
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) String procedureName,
+            @RequestParam(required = false) AppointmentStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ResponseEntity.ok(appointmentService.filterAppointments(clientName, procedureName, status, date));
+    }
+
 
     @GetMapping("/{estheticianCpf}/{clientCpf}/{dateTime}")
     public ResponseEntity<AppointmentDTO> findById(
