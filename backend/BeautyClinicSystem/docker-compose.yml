@@ -8,11 +8,11 @@ services:
       - "./src/main/resources/db/changelog/init.sql:/docker-entrypoint-initdb.d/1-init.sql"
     environment:
       - POSTGRES_DB=beauty-clinic-system-api
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=maju
+      - POSTGRES_PASSWORD=maju
       - TZ=GMT
     ports:
-      - "5432:5432"
+      - "5433:5433"
     restart: always
 networks:
   app-network:
