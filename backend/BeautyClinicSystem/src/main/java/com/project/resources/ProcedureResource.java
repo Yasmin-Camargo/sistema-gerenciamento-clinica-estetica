@@ -22,6 +22,13 @@ public class ProcedureResource {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProcedureDTO>> filterProcedures(
+            @RequestParam(required = false) String name
+    ) {
+        return ResponseEntity.ok(procedureService.filterProcedures(name));
+    }
+
     @GetMapping("/{name}")
     public ResponseEntity<ProcedureDTO> findByName(@PathVariable String name) {
         ProcedureDTO dto = procedureService.findByName(name);

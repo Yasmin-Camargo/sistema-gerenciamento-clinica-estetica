@@ -4,7 +4,9 @@ import com.project.dto.ProcedureDTO;
 import com.project.mappers.ProcedureMapper;
 import com.project.models.Procedure;
 import com.project.repositories.ProcedureRepository;
+import com.project.specification.ProcedureSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +25,20 @@ public class ProcedureService {
     @Transactional(readOnly = true)
     public List<ProcedureDTO> listAll() {
         return procedureRepository.findAll().stream()
+                .map(ProcedureMapper::fromEntityToDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProcedureDTO> filterProcedures(String name) {
+        Specification<Procedure> spec = Specification.where(null);
+
+        if (name != null && !name.isBlank()) {
+            spec = spec.and(ProcedureSpecification.nameContains(name));
+        }
+
+        return procedureRepository.findAll(spec)
+                .stream()
                 .map(ProcedureMapper::fromEntityToDto)
                 .toList();
     }
