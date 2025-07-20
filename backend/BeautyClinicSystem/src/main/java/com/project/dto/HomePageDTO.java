@@ -8,12 +8,6 @@ public record HomePageDTO(
         List<PopularProceduresDTO> popularProcedures,
         Double totalRevenue
 ) {
-
-    public record PopularProceduresDTO(
-            String name,
-            Integer count
-    ) {
-    }
 }
 
 

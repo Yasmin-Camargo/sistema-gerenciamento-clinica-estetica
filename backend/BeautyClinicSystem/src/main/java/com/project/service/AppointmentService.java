@@ -2,20 +2,19 @@ package com.project.service;
 
 import com.project.dto.AppointmentDTO;
 import com.project.mappers.AppointmentMapper;
-import com.project.models.Appointment;
-import com.project.models.Client;
-import com.project.models.Esthetician;
-import com.project.models.Procedure;
-import com.project.models.AppointmentId;
+import com.project.models.*;
 import com.project.repositories.AppointmentRepository;
 import com.project.repositories.ClientRepository;
 import com.project.repositories.EstheticianRepository;
 import com.project.repositories.ProcedureRepository;
+import com.project.specification.AppointmentSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -32,6 +31,18 @@ public class AppointmentService {
     @Transactional(readOnly = true)
     public List<AppointmentDTO> listAll() {
         return appointmentRepository.findAll().stream()
+                .map(AppointmentMapper::fromEntityToDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> filterAppointments(String clientName, String procedureName, AppointmentStatus status, LocalDate date) {
+        Specification<Appointment> spec = Specification.where(AppointmentSpecification.clientNameContains(clientName))
+                .and(AppointmentSpecification.hasProcedure(procedureName))
+                .and(AppointmentSpecification.hasStatus(status))
+                .and(AppointmentSpecification.hasDate(date));
+
+        return appointmentRepository.findAll(spec).stream()
                 .map(AppointmentMapper::fromEntityToDto)
                 .toList();
     }
