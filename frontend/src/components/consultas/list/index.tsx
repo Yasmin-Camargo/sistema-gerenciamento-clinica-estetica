@@ -3,14 +3,7 @@ import { StandardPage } from '../../listPadrao';
 import { ConsultaStyles } from './styles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
-
-export interface Consulta {
-  data: string;    
-  cliente: string;
-  status: 'Pendente' | 'Concluída' | 'Cancelada';
-  procedimentos: string;
-  valor: string;
-}
+import { Consulta } from '../../../types';
 
 export const ConsultasPage: React.FC = () => {
   const consultas: Consulta[] = [

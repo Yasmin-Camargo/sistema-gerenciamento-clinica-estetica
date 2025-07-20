@@ -1,10 +1,12 @@
 package com.project.service;
 
 import com.project.dto.EstheticianDTO;
+import com.project.dto.LoginDTO;
 import com.project.mappers.EstheticianMapper;
 import com.project.models.Esthetician;
 import com.project.repositories.EstheticianRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +21,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class EstheticianService {
 
     private final EstheticianRepository estheticianRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Transactional(readOnly = true)
@@ -53,7 +56,7 @@ public class EstheticianService {
 
         Esthetician entity = EstheticianMapper.fromDtoToEntity(createDTO);
 
-        entity.setPassword(createDTO.password());
+        entity.setPassword(passwordEncoder.encode(createDTO.password()));
 
         Esthetician savedEntity = estheticianRepository.save(entity);
         return EstheticianMapper.fromEntityToDto(savedEntity);

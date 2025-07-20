@@ -3,17 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { StandardPage } from '../../components/listPadrao'; // ajuste o caminho
 import { ConsultaStyles } from '../consultas/list/styles';
 import { HomeStyles } from './styles';
-
-interface Consulta {
-  data: string; // aqui a data no formato dd/MM/yyyy
-  cliente: string;
-  status: string;
-  procedimentos: string;
-  valor: string;
-}
+import { useAuth } from '../../Auth/AuthContext';
+import { Consulta } from '../../types';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [dataFiltro, setDataFiltro] = useState('');
 
   const consultas: Consulta[] = [
@@ -50,7 +45,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <StandardPage title="Clínica">
-      <h2>Boas vindas, $nome_esteticista</h2>
+      <h2>Boas vindas, {user?.name || 'Esteticista'}</h2>
 
     <HomeStyles>
       <div className="header-prox-consultas">

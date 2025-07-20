@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { EstheticianFormContainer } from './styles';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../api/api';
 
 export interface EstheticianFormData {
   cpf: string;
@@ -45,10 +45,10 @@ export function EstheticianForm() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/estheticians', formData);
+      const response = await api.post('/auth/register', formData);
       console.log('Esteticista criado com sucesso:', response.data);
       alert('Esteticista cadastrado com sucesso!');
-      navigate('/home'); 
+      navigate('/login'); 
     } catch (error: any) {
       console.error('Erro ao cadastrar esteticista:', error);
       alert('Erro ao cadastrar esteticista. Verifique os dados e tente novamente.');

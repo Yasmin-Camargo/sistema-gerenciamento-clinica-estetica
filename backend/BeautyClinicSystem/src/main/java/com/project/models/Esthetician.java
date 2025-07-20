@@ -8,13 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @PrimaryKeyJoinColumn(name = "cpf")
 @Table(name = "esthetician")
-public class Esthetician extends Person {
+public class Esthetician extends Person implements Serializable {
 
     @Column(nullable = false)
     private String professionalRegistrationNumber;

@@ -1,11 +1,13 @@
 package com.project.resources;
 
 import com.project.dto.EstheticianDTO;
+import com.project.security.EstheticianUserDetails;
 import com.project.service.EstheticianService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,15 @@ import java.util.List;
 public class EstheticianResource {
 
     private final EstheticianService estheticianService;
+
+    @GetMapping("/me")
+    public ResponseEntity<EstheticianDTO> getAuthenticatedUser(@AuthenticationPrincipal EstheticianUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        EstheticianDTO dto = estheticianService.findByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(dto);
+    }
 
     @GetMapping
     public ResponseEntity<List<EstheticianDTO>> listAll() {
@@ -28,12 +39,6 @@ public class EstheticianResource {
     public ResponseEntity<EstheticianDTO> findByCpf(@PathVariable String cpf) {
         EstheticianDTO dto = estheticianService.findByCpf(cpf);
         return ResponseEntity.ok(dto);
-    }
-
-    @PostMapping
-    public ResponseEntity<EstheticianDTO> create(@Valid @RequestBody EstheticianDTO dto) {
-        EstheticianDTO createdDto = estheticianService.create(dto);
-        return ResponseEntity.ok(createdDto);
     }
 
     @PutMapping("/{cpf}")

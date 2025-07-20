@@ -28,7 +28,6 @@ public class EstheticianMapper {
         esthetician.setAddress(dto.address());
         esthetician.setProfessionalRegistrationNumber(dto.professionalRegistrationNumber());
         esthetician.setSpecializations(dto.specializations());
-        esthetician.setPassword(dto.password());
         return esthetician;
     }
 }
