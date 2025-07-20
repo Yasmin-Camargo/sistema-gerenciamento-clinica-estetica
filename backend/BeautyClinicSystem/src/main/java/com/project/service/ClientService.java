@@ -4,11 +4,14 @@ import com.project.dto.ClientDTO;
 import com.project.mappers.ClientMapper;
 import com.project.models.Client;
 import com.project.repositories.ClientRepository;
+import com.project.specification.ClientSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -23,6 +26,18 @@ public class ClientService {
     @Transactional(readOnly = true)
     public List<ClientDTO> listAll() {
         return clientRepository.findAll().stream()
+                .map(ClientMapper::fromEntityToDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClientDTO> filterClients(String cpf, String name, OffsetDateTime lastConsultationDate, Boolean isActive) {
+        Specification<Client> spec = Specification.where(ClientSpecification.cpfContains(cpf))
+                .and(ClientSpecification.nameContains(name))
+                .and(ClientSpecification.lastConsultationOn(lastConsultationDate))
+                .and(ClientSpecification.isActive(isActive));
+
+        return clientRepository.findAll(spec).stream()
                 .map(ClientMapper::fromEntityToDto)
                 .toList();
     }

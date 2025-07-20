@@ -4,9 +4,11 @@ import com.project.dto.ClientDTO;
 import com.project.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -20,6 +22,16 @@ public class ClientResource {
     public ResponseEntity<List<ClientDTO>> listAll() {
         List<ClientDTO> list = clientService.listAll();
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ClientDTO>> filterClients(
+            @RequestParam(required = false) String cpf,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime lastConsultationDate,
+            @RequestParam(required = false) Boolean isActive
+    ) {
+        return ResponseEntity.ok(clientService.filterClients(cpf, name, lastConsultationDate, isActive));
     }
 
     @GetMapping("/{cpf}")
