@@ -12,6 +12,6 @@ public record AppointmentDTO(
         String clinicalNotes,
         Double value,
         AppointmentStatus status,
-        List<String> procedures
+        List<String> proceduresName
 ) {
 }
