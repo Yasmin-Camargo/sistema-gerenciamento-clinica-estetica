@@ -63,6 +63,17 @@ export const Content = styled.div<ContentProps>`
     margin-bottom: 1.5rem;
   }
 
+  textarea {
+    width: 100%;
+    height: 100px;
+    padding: 0.75rem;
+    border: 1px solid #c87624;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    resize: vertical;
+  }
+
 .table {
   width: 100%;
   border-collapse: separate; 

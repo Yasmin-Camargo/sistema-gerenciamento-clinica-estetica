@@ -7,6 +7,8 @@ import { HomePage } from './components/home';
 import { LoginPage } from './components/esteticista/login';
 import { Logout } from './components/esteticista/logout';
 import { PrivateRoute } from './Auth/PrivateRoute';
+import { NewProcedurePage } from './components/procedimentos/new';
+import { ProcedurePage } from './components/procedimentos/list';
 
 function App() {
   return (
@@ -16,6 +18,16 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/estheticians" element={<EstheticianForm />} />
+      <Route path="/procedure" element={
+        <PrivateRoute>
+          <ProcedurePage />
+        </PrivateRoute>
+      } />
+      <Route path="/procedure/new" element={
+        <PrivateRoute>
+          <NewProcedurePage />
+        </PrivateRoute>
+      } />
       <Route path="/standard" element={
         <PrivateRoute>
           <StandardPage title="Título"/>

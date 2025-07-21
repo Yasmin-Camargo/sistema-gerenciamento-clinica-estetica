@@ -16,7 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
     { label: 'Consultas',         icon: `${base}/logo_consulta.png`,      path: '/consultas' },
     { label: 'Clientes',          icon: `${base}/logo_clientes.png`,      path: '/clientes' },
     { label: 'Produtos',          icon: `${base}/logo_produtos.png`,      path: '/produtos' },
-    { label: 'Procedimentos',     icon: `${base}/logo_procedimentos.png`, path: '/procedimentos' },
+    { label: 'Procedimentos',     icon: `${base}/logo_procedimentos.png`, path: '/procedure' },
     { label: 'Configurações',     icon: `${base}/logo_configuracoes.png`, path: '/configuracoes' },
     { label: 'Sair',              icon: `${base}/logo_sair.png`,          path: '/logout' },
   ];

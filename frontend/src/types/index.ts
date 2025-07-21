@@ -17,3 +17,11 @@ export interface Consulta {
   procedimentos: string;
   valor: string;
 }
+
+export interface Procedimento {
+  name: string;
+  description: string;
+  estimatedDuration: number;
+  cost: number;
+}
+
