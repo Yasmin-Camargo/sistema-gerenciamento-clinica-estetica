@@ -16,7 +16,16 @@ export const RemoveModal: React.FC<RemoveModalProps> = ({
   title = 'Remover item',
   message = 'Tem certeza que deseja remover este item?',
 }) => {
+  
   if (!isOpen) return null;
+
+  const handleConfirm = () => {
+    onConfirm();
+  };
+
+  const handleClose = () => {
+    onClose();
+  };
 
   return (
     <ModalOverlay>
@@ -24,8 +33,8 @@ export const RemoveModal: React.FC<RemoveModalProps> = ({
         <h2>{title}</h2>
         <p>{message}</p>
         <div className="actions">
-          <button className="cancel" onClick={onClose}>Cancelar</button>
-          <button className="confirm" onClick={onConfirm}>Remover</button>
+          <button className="cancel" onClick={handleClose}>Cancelar</button>
+          <button className="confirm" onClick={handleConfirm}>Remover</button>
         </div>
       </ModalContent>
     </ModalOverlay>

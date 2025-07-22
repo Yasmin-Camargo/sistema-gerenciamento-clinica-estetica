@@ -1,47 +1,44 @@
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState, useEffect } from 'react';
 import { StandardPage } from '../../components/listPadrao'; // ajuste o caminho
 import { ConsultaStyles } from '../consultas/list/styles';
 import { HomeStyles } from './styles';
 import { useAuth } from '../../Auth/AuthContext';
-import { Consulta } from '../../types';
+import { AppointmentDTO } from '../../types';
+import { appointmentService } from '../../services/appointmentService';
+import { formatAppointmentForDisplay, extractDateFromDateTime } from '../../utils/appointmentUtils';
 
 export const HomePage: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [dataFiltro, setDataFiltro] = useState('');
+  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const consultas: Consulta[] = [
-    {
-      data: '10/08/2025',
-      cliente: 'Ana Souza',
-      status: 'Pendente',
-      procedimentos: 'Limpeza de Pele',
-      valor: 'R$ 150,00',
-    },
-    {
-      data: '09/08/2025',
-      cliente: 'João Silva',
-      status: 'Concluída',
-      procedimentos: 'Microagulhamento',
-      valor: 'R$ 300,00',
-    },
-  ];
+  useEffect(() => {
+    loadAppointments();
+  }, []);
 
-  // Função para converter 'dd/MM/yyyy' para 'yyyy-MM-dd'
-  const formatarDataParaISO = (dataBR: string) => {
-    const [dia, mes, ano] = dataBR.split('/');
-    return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+  const loadAppointments = async () => {
+    try {
+      setLoading(true);
+      const data = await appointmentService.listAll();
+      setAppointments(data);
+    } catch (error) {
+      console.error('Erro ao carregar consultas:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const consultasFiltradas = useMemo(() => {
-    if (!dataFiltro) return consultas;
+    if (!dataFiltro) return appointments.map(formatAppointmentForDisplay);
 
-    return consultas.filter((c) => {
-      const dataISO = formatarDataParaISO(c.data);
-      return dataISO === dataFiltro;
-    });
-  }, [dataFiltro, consultas]);
+    return appointments
+      .filter((appointment) => {
+        const appointmentDate = extractDateFromDateTime(appointment.dateTime);
+        return appointmentDate === dataFiltro;
+      })
+      .map(formatAppointmentForDisplay);
+  }, [dataFiltro, appointments]);
 
   return (
     <StandardPage title="Clínica">
@@ -69,7 +66,13 @@ export const HomePage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {consultasFiltradas.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={3} style={{ textAlign: 'center' }}>
+                  Carregando consultas...
+                </td>
+              </tr>
+            ) : consultasFiltradas.length === 0 ? (
               <tr>
                 <td colSpan={3} style={{ textAlign: 'center' }}>
                   Nenhuma consulta encontrada.
