@@ -31,10 +31,11 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public List<ClientDTO> filterClients(String cpf, String name, OffsetDateTime lastConsultationDate, Boolean isActive) {
+    public List<ClientDTO> filterClients(String cpf, String name, OffsetDateTime startDate, OffsetDateTime endDate, Boolean isActive) {
         Specification<Client> spec = Specification.where(ClientSpecification.cpfContains(cpf))
                 .and(ClientSpecification.nameContains(name))
-                .and(ClientSpecification.lastConsultationOn(lastConsultationDate))
+                .and(ClientSpecification.lastConsultationOn(startDate))
+                .and(ClientSpecification.lastConsultationOn(endDate))
                 .and(ClientSpecification.isActive(isActive));
 
         return clientRepository.findAll(spec).stream()

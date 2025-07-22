@@ -118,6 +118,15 @@ export const Content = styled.div<ContentProps>`
     gap: 1rem;
   }
 
+  .filtros .react-datepicker-wrapper input{
+    min-width: 300px;
+  }
+
+.react-datepicker__close-icon::after {
+    flex: 1 1 200px;
+    background-color: #a75d16;
+  }
+
   .filtros input,
   .filtros select {
     flex: 1 1 200px;

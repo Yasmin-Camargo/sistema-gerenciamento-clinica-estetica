@@ -13,23 +13,27 @@ export const ProcedurePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [modalAberto, setModalAberto] = useState(false);
   const [procedimentoSelecionado, setProcedimentoSelecionado] = useState<ProcedimentoDTO | null>(null);
+  const [busca, setBusca] = useState('');
   const navigate = useNavigate();
 
+
   useEffect(() => {
-    fetchProcedimentos();
+    fetchProcedures();
   }, []);
 
-  const fetchProcedimentos = async () => {
+  const fetchProcedures = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const response = await api.get('/procedures');
-      setProcedimentos(response.data);
+      const data = await procedureService.listAll();
+      setProcedimentos(data);
     } catch (err) {
-      setError('Erro ao carregar procedimentos');
+      setError('Erro ao carregar procedimentos.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
-
   const truncate = (text: string, maxLength: number) =>
     text.length <= maxLength ? text : text.slice(0, maxLength) + '...';
 
@@ -45,20 +49,66 @@ export const ProcedurePage: React.FC = () => {
     setProcedimentoSelecionado(proc);
     setModalAberto(true);
   };
+  
+    const handleConfirmRemove = async () => {
+      if (!procedimentoSelecionado) return;
+  
+      try {
+        await procedureService.delete(procedimentoSelecionado.name);
+        setModalAberto(false);
+        setProcedimentos((prev) => prev.filter((p) => p.name !== procedimentoSelecionado.name));
+      } catch (error: any) {
+        console.error('Erro ao remover procedimento:', error);
+        if (error.response?.data?.message) {
+          alert(`Erro ao remover procedimento: ${error.response.data.message}`);
+        } else {
+          alert('Erro ao remover procedimento. Tente novamente.');
+        }
+      }
+    };
 
-  const handleConfirmRemove = async () => {
-  if (!procedimentoSelecionado) return;
-  await procedureService.delete(encodeURIComponent(procedimentoSelecionado.name));
-  await fetchProcedimentos();
-  alert('Procedimento excluído com sucesso!');
-  setProcedimentoSelecionado(null);
-};
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBusca(e.target.value);
+  };
+
+  const handleBusca = async () => {
+    if (!busca.trim()) {
+      fetchProcedures();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const encontrado = await procedureService.findByName(busca.trim());
+      setProcedimentos([encontrado]);
+    } catch {
+      setProcedimentos([]);
+      alert('Procedimento não encontrado.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const filtros = ( 
+    <div className="filtros">
+      <input
+        placeholder="Busca procedimento"
+        value={busca}
+        onChange={handleChange}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') handleBusca();
+      }}
+      />
+    </div>
+  );
 
   return (
     <StandardPage
       title="Procedimentos"
       buttonLabel="Novo Procedimento"
       onButtonClick={navigateToNewProcedure}
+      filters={filtros}
     >
       <TableStyles>
         <table className="table">

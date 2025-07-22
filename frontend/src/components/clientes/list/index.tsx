@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StandardPage } from '../../listPadrao';  
 import { TableStyles } from '../../tableStyles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { ClientDTO } from '../../../types';
 import { clientService } from '../../../services/clientService';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
   export const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<ClientDTO[]>([]);
@@ -13,6 +15,13 @@ import { clientService } from '../../../services/clientService';
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<ClientDTO | null>(null);
   const navigate = useNavigate();
+
+  // Estados para filtros
+  const [filterCpf, setFilterCpf] = useState('');
+  const [filterName, setFilterName] = useState('');
+  const [filterDateRange, setFilterDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [filterIsActive, setFilterIsActive] = useState<string>(''); 
+
 
   useEffect(() => {
     fetchClients();
@@ -26,6 +35,32 @@ import { clientService } from '../../../services/clientService';
       setClients(data);
     } catch (err) {
       setError('Erro ao carregar clientes.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
+  const fetchClientsFiltered = async () => {
+    setLoading(true);
+    setError(null);
+
+    const [startDate, endDate] = filterDateRange;
+    const startISO = startDate ? startDate.toISOString() : undefined;
+    const endISO = endDate ? endDate.toISOString() : undefined;
+
+    try {
+      const data = await clientService.filterClients(
+        filterCpf || undefined,
+        filterName || undefined,
+        startISO,
+        endISO,
+        filterIsActive === '' ? undefined : filterIsActive === 'true'
+      );
+      setClients(data);
+    } catch (err) {
+      setError('Erro ao filtrar clientes.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -46,25 +81,73 @@ import { clientService } from '../../../services/clientService';
   };
 
   const confirmRemove = async () => {
-    if (!selectedClient) return;
-    try {
-      await clientService.delete(selectedClient.cpf);
-      alert('Cliente removido com sucesso!');
-      await fetchClients();
-    } catch (err) {
-      alert('Erro ao remover cliente.');
-      console.error(err);
-    } finally {
-      setModalOpen(false);
-      setSelectedClient(null);
+      if (!selectedClient) return;
+      try {
+        await clientService.delete(selectedClient.cpf);
+        alert('Cliente removido com sucesso!');
+        await fetchClientsFiltered(); 
+      } catch (err) {
+        alert('Erro ao remover cliente.');
+        console.error(err);
+      } finally {
+        setModalOpen(false);
+        setSelectedClient(null);
+      }
+    };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter') {
+      fetchClientsFiltered();
     }
   };
+
+  const filtros = (
+    <div className="filtros">
+         <input
+          type="text"
+          placeholder="CPF"
+          value={filterCpf}
+          onChange={(e) => setFilterCpf(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <input
+          type="text"
+          placeholder="Nome"
+          value={filterName}
+          onChange={(e) => setFilterName(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      {/* <div>
+        <DatePicker
+          selectsRange
+          startDate={filterDateRange[0]}
+          endDate={filterDateRange[1]}
+          onChange={(dates) => setFilterDateRange(dates as [Date | null, Date | null])}
+          isClearable={true}
+          placeholderText="Selecione o intervalo de datas"
+          onKeyDown={handleKeyDown}
+          dateFormat="dd-MM-yyyy"
+        />
+      </div> */}
+        <select
+          value={filterIsActive}
+          onChange={(e) => setFilterIsActive(e.target.value)}
+          onKeyDown={handleKeyDown}
+        >
+          <option value="">Todos</option>
+          <option value="true">Ativos</option>
+          <option value="false">Inativos</option>
+        </select>
+        </div>
+    )
+
 
   return (
     <StandardPage
       title="Clientes"
       buttonLabel="Novo Cliente"
       onButtonClick={navigateToNewClient}
+      filters={filtros}
     >
       <TableStyles>
         <table className="table">

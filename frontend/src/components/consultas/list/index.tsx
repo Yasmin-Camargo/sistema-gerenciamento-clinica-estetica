@@ -40,7 +40,6 @@ export const ConsultasPage: React.FC = () => {
   };
 
   const editarConsulta = (appointment: AppointmentDTO) => {
-    // Implementar navegação para página de edição
     navigate(`/consultas/${appointment.client.cpf}/${appointment.dateTime}`);
   };  
   
