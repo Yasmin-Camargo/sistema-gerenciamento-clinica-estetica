@@ -16,9 +16,8 @@ export const ConsultasPage: React.FC = () => {
   const [procedimentoFiltro, setProcedimentoFiltro] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
-  const [consultaSelecionada, setConsultaSelecionada] = useState<any>(null);
+  const [consultaSelecionada, setConsultaSelecionada] = useState<ReturnType<typeof formatAppointmentForDisplay> | null>(null);
 
-  // Carrega as consultas ao montar o componente
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -35,15 +34,14 @@ export const ConsultasPage: React.FC = () => {
     }
   };
 
-  const excluirConsulta = (consultaFormatada: any) => {
+  const excluirConsulta = (consultaFormatada: ReturnType<typeof formatAppointmentForDisplay>) => {
     setConsultaSelecionada(consultaFormatada);
     setModalAberto(true);
   };
 
   const editarConsulta = (appointment: AppointmentDTO) => {
-    // Navegar para a página de edição com o ID do appointment
-    console.log('Editar consulta:', appointment);
-    // TODO: implementar navegação para página de edição
+    // Implementar navegação para página de edição
+    navigate(`/consultas/${appointment.client.cpf}/${appointment.dateTime}`);
   };  
   
   const confirmarRemocao = async () => {

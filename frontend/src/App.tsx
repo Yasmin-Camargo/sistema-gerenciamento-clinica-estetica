@@ -23,7 +23,7 @@ function App() {
           <ProcedurePage />
         </PrivateRoute>
       } />
-      <Route path="/procedure/edit" element={
+      <Route path="/procedure/edit/:name" element={
         <PrivateRoute>
           <EditProcedurePage />
         </PrivateRoute>
