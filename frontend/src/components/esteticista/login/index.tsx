@@ -14,11 +14,7 @@ export function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/auth/login', {
-        email,
-        password
-      });
-
+      await api.post('/auth/login', { email, password });
       await login();
       navigate('/home');
     } catch (error) {
@@ -31,26 +27,36 @@ export function LoginPage() {
     <LoginPageContainer>
       <form onSubmit={handleLogin}>
         <h2>Clínica</h2>
-        <input
-          type="email"
-          placeholder="meuemail@gmail.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="meuemail@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Senha</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
         <button type="submit">Login</button>
+
         <p>
           Ainda não é cadastrado?{' '}
-          <span onClick={() => navigate('/estheticians')} style={{ cursor: 'pointer', color: 'blue' }}>
-            Cadastre-se
-          </span>
+          <span onClick={() => navigate('/estheticians')}>Cadastre-se</span>
         </p>
       </form>
     </LoginPageContainer>
