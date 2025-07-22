@@ -14,10 +14,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
   const items = [
     { label: 'Início',            icon: `${base}/logo_inicio.png`,        path: '/home' },
     { label: 'Consultas',         icon: `${base}/logo_consulta.png`,      path: '/consultas' },
-    { label: 'Clientes',          icon: `${base}/logo_clientes.png`,      path: '/clientes' },
-    { label: 'Produtos',          icon: `${base}/logo_produtos.png`,      path: '/produtos' },
-    { label: 'Procedimentos',     icon: `${base}/logo_procedimentos.png`, path: '/procedure' },
-    { label: 'Configurações',     icon: `${base}/logo_configuracoes.png`, path: '/configuracoes' },
+    { label: 'Clientes',          icon: `${base}/logo_clientes.png`,      path: '/clients' },
+    { label: 'Produtos',          icon: `${base}/logo_produtos.png`,      path: '/products' },
+    { label: 'Procedimentos',     icon: `${base}/logo_procedimentos.png`, path: '/procedures' },
+    { label: 'Configurações',     icon: `${base}/logo_configuracoes.png`, path: '/settings' },
     { label: 'Sair',              icon: `${base}/logo_sair.png`,          path: '/logout' },
   ];
 
