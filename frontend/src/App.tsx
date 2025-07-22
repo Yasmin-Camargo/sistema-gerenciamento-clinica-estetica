@@ -13,6 +13,8 @@ import { EditProcedurePage } from './components/procedimentos/edit';
 import { ClientPage } from './components/clientes/list';
 import { NewClientPage } from './components/clientes/new';
 import { EditClientPage } from './components/clientes/edit';
+import { SettingsPage } from './components/configuracoes';
+
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +72,11 @@ function App() {
       <Route path="/home" element={
         <PrivateRoute>
           <HomePage />
+        </PrivateRoute>
+      } />
+      <Route path="/settings" element={
+        <PrivateRoute>
+          <SettingsPage />
         </PrivateRoute>
       } />
     </Routes>

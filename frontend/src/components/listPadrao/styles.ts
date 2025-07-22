@@ -14,7 +14,6 @@ export const Content = styled.div<ContentProps>`
   transition: margin-left 0.3s;
   padding: 1.5rem;
   width: 100%;
-  min-height: 100vh;
   box-sizing: border-box;
   overflow-x: auto;
 
