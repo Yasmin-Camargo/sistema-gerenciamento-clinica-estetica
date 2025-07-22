@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { StandardPage } from '../../listPadrao';  
-import { ConsultaStyles } from './styles';
+import { TableStyles } from '../../tableStyles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { AppointmentDTO } from '../../../types';
@@ -127,7 +127,7 @@ export const ConsultasPage: React.FC = () => {
       onButtonClick={navigateNovaConsulta}
       filters={filtros}
     >
-      <ConsultaStyles>
+      <TableStyles>
         <table className="table">
           <thead>
             <tr>
@@ -179,7 +179,7 @@ export const ConsultasPage: React.FC = () => {
             )}
           </tbody>
         </table>
-      </ConsultaStyles>
+      </TableStyles>
 
       <RemoveModal
         isOpen={modalAberto}

@@ -4,7 +4,7 @@ import { ModalOverlay, ModalContent } from './styles';
 interface RemoveModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void>;  // Agora espera uma Promise
+  onConfirm: () => Promise<void>;
   title?: string;
   message?: string;
 }

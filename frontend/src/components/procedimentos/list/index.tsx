@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { StandardPage } from '../../listPadrao';  
-import { ConsultaStyles } from '../../consultas/list/styles';
+import { TableStyles } from '../../tableStyles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { ProcedimentoDTO } from '../../../types';
@@ -46,20 +46,6 @@ export const ProcedurePage: React.FC = () => {
     setModalAberto(true);
   };
 
-  const confirmarRemocao = async () => {
-    if (procedimentoSelecionado) {
-      try {
-        await api.delete(`/procedures/${procedimentoSelecionado.name}`);
-        await fetchProcedimentos();
-        alert('Procedimento excluído com sucesso!');
-      } catch (err) {
-        alert('Erro ao excluir procedimento.');
-        console.error(err);
-      }
-      setModalAberto(false);
-    }
-  };
-
   const handleConfirmRemove = async () => {
   if (!procedimentoSelecionado) return;
   await procedureService.delete(encodeURIComponent(procedimentoSelecionado.name));
@@ -74,7 +60,7 @@ export const ProcedurePage: React.FC = () => {
       buttonLabel="Novo Procedimento"
       onButtonClick={navigateToNewProcedure}
     >
-      <ConsultaStyles>
+      <TableStyles>
         <table className="table">
           <thead>
             <tr>
@@ -120,7 +106,7 @@ export const ProcedurePage: React.FC = () => {
             )}
           </tbody>
         </table>
-      </ConsultaStyles>
+      </TableStyles>
 
     <RemoveModal
       isOpen={modalAberto}

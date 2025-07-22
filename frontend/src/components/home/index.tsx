@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { StandardPage } from '../../components/listPadrao';
-import { ConsultaStyles } from '../consultas/list/styles';
+import { TableStyles } from '../tableStyles';
 import { HomeStyles } from './styles';
 import { useAuth } from '../../Auth/AuthContext';
 import { formatAppointmentForDisplay, extractDateFromDateTime } from '../../utils/appointmentUtils';
@@ -56,7 +56,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <ConsultaStyles>
+        <TableStyles>
           <table className="table">
             <thead>
               <tr>
@@ -89,7 +89,7 @@ export const HomePage: React.FC = () => {
               )}
             </tbody>
           </table>
-        </ConsultaStyles>
+        </TableStyles>
 
         <h3>Procedimentos populares</h3>
         <div className="caixas">
