@@ -59,6 +59,14 @@ export const ProcedurePage: React.FC = () => {
                   <td>{truncate(proc.description, 50)}</td> {/* descrição truncada */}
                   <td>{proc.estimatedDuration}</td>
                   <td>{proc.cost.toFixed(2)}</td>
+                  <td className="action-cell">
+                    <button className="action-button" onClick={() => navigate(`/procedure/edit/`)}>
+                      <img src="/IconEdit.png" alt="Editar" />
+                    </button>
+                    {/* <button className="action-button" onClick={() => excluirProcedimento}>
+                      <img src="/IconLixo.png" alt="Excluir" />
+                    </button> */}
+                  </td>
                 </tr>
               ))
             ) : (

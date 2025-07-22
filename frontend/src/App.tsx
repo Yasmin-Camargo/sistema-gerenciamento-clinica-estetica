@@ -9,7 +9,7 @@ import { Logout } from './components/esteticista/logout';
 import { PrivateRoute } from './Auth/PrivateRoute';
 import { NewProcedurePage } from './components/procedimentos/new';
 import { ProcedurePage } from './components/procedimentos/list';
-
+import { EditProcedurePage } from './components/procedimentos/edit';
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +21,11 @@ function App() {
       <Route path="/procedure" element={
         <PrivateRoute>
           <ProcedurePage />
+        </PrivateRoute>
+      } />
+      <Route path="/procedure/edit" element={
+        <PrivateRoute>
+          <EditProcedurePage />
         </PrivateRoute>
       } />
       <Route path="/procedure/new" element={
