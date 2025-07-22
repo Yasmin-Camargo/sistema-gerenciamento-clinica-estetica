@@ -6,7 +6,6 @@ import com.project.dto.HomePageDTO;
 import com.project.dto.PopularProceduresDTO;
 import com.project.mappers.AppointmentMapper;
 import com.project.models.AppointmentStatus;
-import com.project.models.Person;
 import com.project.repositories.AppointmentRepository;
 import com.project.repositories.ClientRepository;
 import com.project.repositories.EstheticianRepository;
@@ -24,7 +23,6 @@ public class DashboardService {
     private final ClientRepository clientRepository;
     private final AppointmentRepository appointmentRepository;
     private final ProcedureRepository procedureRepository;
-    private final EstheticianRepository estheticianRepository;
 
     public ClinicOverviewDTO getSummary() {
         int totalClients = (int) clientRepository.count();
@@ -35,12 +33,6 @@ public class DashboardService {
     }
 
     public HomePageDTO getHomePageData() {
-        String estheticianName = estheticianRepository.findAll()
-                .stream()
-                .findFirst()
-                .map(Person::getName)
-                .orElse("No Esthetician Found");
-
         OffsetDateTime now = OffsetDateTime.now();
 
         List<AppointmentDTO> nextAppointments = appointmentRepository.findNextAppointments(now).stream()
@@ -54,6 +46,6 @@ public class DashboardService {
         Double totalRevenue = Optional.ofNullable(appointmentRepository.getTotalRevenueFromCompletedAppointments(AppointmentStatus.COMPLETED))
                 .orElse(0.0);
 
-        return new HomePageDTO(estheticianName, nextAppointments, popularProcedures, totalRevenue);
+        return new HomePageDTO(nextAppointments, popularProcedures, totalRevenue);
     }
 }
