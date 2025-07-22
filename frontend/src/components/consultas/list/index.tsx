@@ -1,61 +1,90 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { StandardPage } from '../../listPadrao';  
 import { ConsultaStyles } from './styles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
-import { Consulta } from '../../../types';
+import { AppointmentDTO } from '../../../types';
+import { appointmentService } from '../../../services/appointmentService';
+import { formatAppointmentForDisplay, extractDateFromDateTime } from '../../../utils/appointmentUtils';
 
 export const ConsultasPage: React.FC = () => {
-  const consultas: Consulta[] = [
-    {
-      data: '10/08/2025',
-      cliente: 'Ana Souza',
-      status: 'Pendente',
-      procedimentos: 'Limpeza de Pele',
-      valor: 'R$ 150,00',
-    },
-    {
-      data: '09/08/2025',
-      cliente: 'João Silva',
-      status: 'Concluída',
-      procedimentos: 'Microagulhamento',
-      valor: 'R$ 300,00',
-    },
-  ];
-
   const navigate = useNavigate();
+  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
   const [dataFiltro, setDataFiltro] = useState('');
   const [procedimentoFiltro, setProcedimentoFiltro] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
-  const [consultaSelecionada, setConsultaSelecionada] = useState<Consulta | null>(null);
+  const [consultaSelecionada, setConsultaSelecionada] = useState<any>(null);
 
-const excluirConsulta = (consulta: Consulta) => {
-  setConsultaSelecionada(consulta);
-  setModalAberto(true);
-};
+  // Carrega as consultas ao montar o componente
+  useEffect(() => {
+    loadAppointments();
+  }, []);
 
-const confirmarRemocao = () => {
-  if (consultaSelecionada) {
-    // Aqui você pode fazer a lógica de remover (ex: via API)
-    console.log('Remover:', consultaSelecionada);
-  }
-  setModalAberto(false);
-};
+  const loadAppointments = async () => {
+    try {
+      setLoading(true);
+      const data = await appointmentService.listAll();
+      setAppointments(data);
+    } catch (error) {
+      console.error('Erro ao carregar consultas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const excluirConsulta = (consultaFormatada: any) => {
+    setConsultaSelecionada(consultaFormatada);
+    setModalAberto(true);
+  };
+
+  const editarConsulta = (appointment: AppointmentDTO) => {
+    // Navegar para a página de edição com o ID do appointment
+    console.log('Editar consulta:', appointment);
+    // TODO: implementar navegação para página de edição
+  };  
+  
+  const confirmarRemocao = async () => {
+    if (consultaSelecionada?.original) {
+      try {
+        const appointment = consultaSelecionada.original;
+      
+        await appointmentService.delete(
+          appointment.esthetician.cpf,
+          appointment.client.cpf,
+          appointment.dateTime
+        );
+        
+        await loadAppointments();
+        alert('Consulta removida com sucesso!');
+      } catch (error: any) {
+        console.error('Erro ao remover consulta:', error);
+        if (error.response?.data?.message) {
+          alert(`Erro ao remover consulta: ${error.response.data.message}`);
+        } else {
+          alert('Erro ao remover consulta. Tente novamente.');
+        }
+      }
+    } 
+    setModalAberto(false);
+  };
 
   const consultasFiltradas = useMemo(() => {
-    return consultas.filter((c) => {
+    const formattedAppointments = appointments.map(formatAppointmentForDisplay);
+    
+    return formattedAppointments.filter((c) => {
       const matchBusca =
         !busca || c.cliente.toLowerCase().includes(busca.toLowerCase());
-      const matchData = !dataFiltro || c.data === dataFiltro;
+      const matchData = !dataFiltro || extractDateFromDateTime(c.original.dateTime) === dataFiltro;
       const matchProc =
         !procedimentoFiltro ||
         c.procedimentos.toLowerCase().includes(procedimentoFiltro.toLowerCase());
       const matchStatus = !statusFiltro || c.status === statusFiltro;
       return matchBusca && matchData && matchProc && matchStatus;
     });
-  }, [busca, dataFiltro, procedimentoFiltro, statusFiltro]);
+  }, [busca, dataFiltro, procedimentoFiltro, statusFiltro, appointments]);
 
   const filtros = (
     <div className="filtros">
@@ -79,7 +108,7 @@ const confirmarRemocao = () => {
 
       <select
         value={statusFiltro}
-        onChange={(e) => setStatusFiltro(e.target.value as Consulta['status'] | '')}
+        onChange={(e) => setStatusFiltro(e.target.value)}
       >
         <option value="">Status</option>
         <option value="Pendente">Pendente</option>
@@ -104,37 +133,52 @@ const confirmarRemocao = () => {
         <table className="table">
           <thead>
             <tr>
-              <th>Data</th>
               <th>Cliente</th>
-              <th>Status</th>
-              <th>Procedimentos</th>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Procedimento</th>
               <th>Valor</th>
+              <th>Status</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            {consultasFiltradas.map((c) => (
-              <tr key={`${c.data}-${c.cliente}`}>
-                <td>{c.data}</td>
-                <td>{c.cliente}</td>
-                <td className={`status ${c.status.toLowerCase()}`}>{c.status}</td>
-                <td>{c.procedimentos}</td>
-                <td>{c.valor}</td>
-                <td className="action-cell">
-                  <button className="action-button">
-                    <img src="/IconEdit.png" alt="Editar" />
-                  </button>
-                  <button onClick={() => excluirConsulta(c)} className="action-button">
-                    <img src="/IconLixo.png" alt="Excluir" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {consultasFiltradas.length === 0 && (
+            {loading ? (
               <tr>
-                <td colSpan={5}>Nenhuma consulta encontrada.</td>
+                <td colSpan={7}>Carregando consultas...</td>
               </tr>
+            ) : consultasFiltradas.length === 0 ? (
+              <tr>
+                <td colSpan={7}>Nenhuma consulta encontrada.</td>
+              </tr>
+            ) : (
+              consultasFiltradas.map((consulta) => (
+                <tr key={`${consulta.original.client.cpf}-${consulta.original.dateTime}`}>
+                  <td>{consulta.cliente}</td>
+                  <td>{consulta.data}</td>
+                  <td>{consulta.hora}</td>
+                  <td>{consulta.procedimentos}</td>
+                  <td>{consulta.valor}</td>
+                  <td className={`status ${consulta.status.toLowerCase()}`}>
+                    {consulta.status}
+                  </td>
+                  <td className="action-cell">
+                    <button 
+                      onClick={() => editarConsulta(consulta.original)}
+                      className="action-button"
+                    >
+                      <img src="/IconEdit.png" alt="Editar" />
+                    </button>
+                    <button 
+                      onClick={() => excluirConsulta(consulta)} 
+                      className="action-button"
+                    >
+                      <img src="/IconLixo.png" alt="Excluir" />
+                    </button>
+                  </td>
+                </tr>
+              ))
             )}
-            
           </tbody>
         </table>
       </ConsultaStyles>
@@ -144,7 +188,7 @@ const confirmarRemocao = () => {
         onClose={() => setModalAberto(false)}
         onConfirm={confirmarRemocao}
         title="Excluir consulta"
-        message={`Tem certeza que deseja excluir a consulta de ${consultaSelecionada?.cliente}?`}
+        message={`Tem certeza que deseja excluir a consulta de ${consultaSelecionada?.original?.client?.name || 'cliente selecionado'}?`}
       />
 
     </StandardPage>
