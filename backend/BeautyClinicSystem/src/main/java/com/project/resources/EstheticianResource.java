@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class EstheticianResource {
 
     private final EstheticianService estheticianService;
 
+    @PreAuthorize("hasRole('ESTHETICIAN')")
     @GetMapping("/me")
     public ResponseEntity<EstheticianDTO> getAuthenticatedUser(@AuthenticationPrincipal EstheticianUserDetails userDetails) {
         if (userDetails == null) {
@@ -28,12 +30,14 @@ public class EstheticianResource {
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('ESTHETICIAN')")
     @GetMapping
     public ResponseEntity<List<EstheticianDTO>> listAll() {
         List<EstheticianDTO> list = estheticianService.listAll();
         return ResponseEntity.ok(list);
     }
 
+    @PreAuthorize("hasRole('ESTHETICIAN')")
     @Transactional
     @GetMapping("/{cpf}")
     public ResponseEntity<EstheticianDTO> findByCpf(@PathVariable String cpf) {
@@ -41,12 +45,14 @@ public class EstheticianResource {
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('ESTHETICIAN')")
     @PutMapping("/{cpf}")
     public ResponseEntity<EstheticianDTO> update(@PathVariable String cpf, @Valid @RequestBody EstheticianDTO dto) {
         EstheticianDTO updatedDto = estheticianService.update(cpf, dto);
         return ResponseEntity.ok(updatedDto);
     }
 
+    @PreAuthorize("hasRole('ESTHETICIAN')")
     @DeleteMapping("/{cpf}")
     public ResponseEntity<Void> delete(@PathVariable String cpf) {
         estheticianService.delete(cpf);
