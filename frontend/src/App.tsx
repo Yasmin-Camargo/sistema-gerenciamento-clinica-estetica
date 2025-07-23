@@ -14,6 +14,7 @@ import { ClientPage } from './components/clientes/list';
 import { NewClientPage } from './components/clientes/new';
 import { EditClientPage } from './components/clientes/edit';
 import { SettingsPage } from './components/configuracoes';
+import { ProductsPage } from './components/produtos';
 
 function App() {
   return (
@@ -77,6 +78,11 @@ function App() {
       <Route path="/settings" element={
         <PrivateRoute>
           <SettingsPage />
+        </PrivateRoute>
+      } />
+      <Route path="/products" element={
+        <PrivateRoute>
+          <ProductsPage />
         </PrivateRoute>
       } />
     </Routes>
