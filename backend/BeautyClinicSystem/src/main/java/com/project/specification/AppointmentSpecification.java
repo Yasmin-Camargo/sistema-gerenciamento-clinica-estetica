@@ -2,6 +2,7 @@ package com.project.specification;
 
 import com.project.models.Appointment;
 import com.project.models.AppointmentStatus;
+import com.project.models.Esthetician;
 import com.project.models.Procedure;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -10,6 +11,14 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
 
 public class AppointmentSpecification {
+    public static Specification<Appointment> byEsthetician(String cpf) {
+        return (root, query, builder) -> {
+            if (cpf == null) return null;
+            Join<Appointment, Esthetician> estheticianJoin = root.join("esthetician", JoinType.INNER);
+            return builder.equal(estheticianJoin.get("cpf"), cpf);
+        };
+    }
+
     public static Specification<Appointment> clientNameContains(String name) {
         return (root, query, builder) -> name == null ? null :
                 builder.like(builder.lower(root.get("client").get("name")), "%" + name.toLowerCase() + "%");

@@ -7,6 +7,7 @@ import com.project.repositories.AppointmentRepository;
 import com.project.repositories.ClientRepository;
 import com.project.repositories.EstheticianRepository;
 import com.project.repositories.ProcedureRepository;
+import com.project.security.AuthService;
 import com.project.specification.AppointmentSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,17 +28,24 @@ public class AppointmentService {
     private final ClientRepository clientRepository;
     private final EstheticianRepository estheticianRepository;
     private final ProcedureRepository procedureRepository;
+    private final AuthService authService;
 
     @Transactional(readOnly = true)
     public List<AppointmentDTO> listAll() {
-        return appointmentRepository.findAll().stream()
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        Specification<Appointment> spec = AppointmentSpecification.byEsthetician(loggedInEstheticianCpf);
+
+        return appointmentRepository.findAll(spec).stream()
                 .map(AppointmentMapper::fromEntityToDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<AppointmentDTO> filterAppointments(String clientName, String procedureName, AppointmentStatus status, LocalDate date) {
-        Specification<Appointment> spec = Specification.where(AppointmentSpecification.clientNameContains(clientName))
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+
+        Specification<Appointment> spec = Specification.where(AppointmentSpecification.byEsthetician(loggedInEstheticianCpf))
+                .and(AppointmentSpecification.clientNameContains(clientName))
                 .and(AppointmentSpecification.hasProcedure(procedureName))
                 .and(AppointmentSpecification.hasStatus(status))
                 .and(AppointmentSpecification.hasDate(date));
@@ -55,6 +63,7 @@ public class AppointmentService {
         id.setDateTime(java.time.OffsetDateTime.parse(dateTime));
 
         Appointment appointment = appointmentRepository.findById(id)
+                .filter(a -> a.getEsthetician().getCpf().equals(authService.getLoggedInEstheticianCpf()))
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "appointment-not-found"));
 
         return AppointmentMapper.fromEntityToDto(appointment);
@@ -62,6 +71,11 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO create(AppointmentDTO dto) {
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        if (!dto.esthetician().cpf().equals(loggedInEstheticianCpf)) {
+            throw new ResponseStatusException(FORBIDDEN, "cannot-create-appointment-for-another-esthetician");
+        }
+
         AppointmentId id = new AppointmentId();
         id.setEstheticianCpf(dto.esthetician().cpf());
         id.setClientCpf(dto.client().cpf());
@@ -92,6 +106,11 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentDTO update(String estheticianCpf, String clientCpf, String dateTime, AppointmentDTO dto) {
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        if (!dto.esthetician().cpf().equals(loggedInEstheticianCpf)) {
+            throw new ResponseStatusException(FORBIDDEN, "cannot-update-appointment-for-another-esthetician");
+        }
+
         AppointmentId id = new AppointmentId();
         id.setEstheticianCpf(estheticianCpf);
         id.setClientCpf(clientCpf);
@@ -113,6 +132,11 @@ public class AppointmentService {
 
     @Transactional
     public void delete(String estheticianCpf, String clientCpf, String dateTime) {
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        if (!estheticianCpf.equals(loggedInEstheticianCpf)) {
+            throw new ResponseStatusException(FORBIDDEN, "cannot-delete-appointment-for-another-esthetician");
+        }
+
         AppointmentId id = new AppointmentId();
         id.setEstheticianCpf(estheticianCpf);
         id.setClientCpf(clientCpf);

@@ -82,9 +82,20 @@ databaseChangeLog:
               - column:
                   name: last_consultation_date
                   type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: esthetician_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableName: client
             baseColumnNames: cpf
             referencedTableName: person
             referencedColumnNames: cpf
             constraintName: fk_client_person
+        - addForeignKeyConstraint:
+            baseTableName: client
+            baseColumnNames: esthetician_cpf
+            referencedTableName: esthetician
+            referencedColumnNames: cpf
+            constraintName: fk_client_esthetician

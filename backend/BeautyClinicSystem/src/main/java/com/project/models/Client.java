@@ -1,8 +1,6 @@
 package com.project.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,4 +23,8 @@ public class Client extends Person{
     private boolean isActive;
 
     private OffsetDateTime lastConsultationDate;
+
+    @ManyToOne
+    @JoinColumn(name = "esthetician_cpf", nullable = false)
+    private Esthetician esthetician;
 }

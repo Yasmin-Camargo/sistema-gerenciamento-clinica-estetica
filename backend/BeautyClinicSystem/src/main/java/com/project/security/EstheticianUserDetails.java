@@ -21,6 +21,14 @@ public class EstheticianUserDetails implements UserDetails, Serializable {
         return List.of(new SimpleGrantedAuthority("ROLE_ESTHETICIAN"));
     }
 
+    public String getCpf() {
+        return this.esthetician.getCpf();
+    }
+
+    public Esthetician getEsthetician(){
+        return this.esthetician;
+    }
+
     @Override
     public String getPassword() {
         return esthetician.getPassword();
