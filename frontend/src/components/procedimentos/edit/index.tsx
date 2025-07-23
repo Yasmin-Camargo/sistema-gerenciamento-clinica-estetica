@@ -12,7 +12,7 @@ export interface ProcedureFormData {
 
 export const EditProcedurePage: React.FC = () => {
   const navigate = useNavigate();
-  const { name } = useParams<{ name: string }>(); // pega o parâmetro da rota
+  const { name } = useParams<{ name: string }>();
   const [formData, setFormData] = useState<ProcedureFormData>({
     name: '',
     description: '',

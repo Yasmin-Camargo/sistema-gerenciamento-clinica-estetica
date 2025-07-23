@@ -29,5 +29,23 @@ export const clientService = {
   // Deleta cliente
   delete: async (cpf: string): Promise<void> => {
     await api.delete(`/clients/${cpf}`);
+  },
+
+  filterClients: async (
+    cpf?: string,
+    name?: string,
+    startDate?: string, 
+    endDate?: string,
+    isActive?: boolean
+  ): Promise<ClientDTO[]> => {
+    const params: any = {};
+    if (cpf) params.cpf = cpf;
+    if (name) params.name = name;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (isActive !== undefined) params.isActive = isActive;
+
+    const response = await api.get('/clients/filter', { params });
+    return response.data;
   }
 };

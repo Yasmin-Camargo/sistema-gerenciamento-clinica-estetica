@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const ConsultaStyles = styled.div`
+export const TableStyles = styled.div`
   .status {
     font-weight: 600;
   }

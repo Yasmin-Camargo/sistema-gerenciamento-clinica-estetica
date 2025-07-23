@@ -28,10 +28,13 @@ public class ClientResource {
     public ResponseEntity<List<ClientDTO>> filterClients(
             @RequestParam(required = false) String cpf,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime lastConsultationDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
             @RequestParam(required = false) Boolean isActive
     ) {
-        return ResponseEntity.ok(clientService.filterClients(cpf, name, lastConsultationDate, isActive));
+        return ResponseEntity.ok(
+            clientService.filterClients(cpf, name, startDate, endDate, isActive)
+        );
     }
 
     @GetMapping("/{cpf}")

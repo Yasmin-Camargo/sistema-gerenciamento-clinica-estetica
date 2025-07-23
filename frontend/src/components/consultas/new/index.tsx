@@ -5,7 +5,7 @@ import { appointmentService } from '../../../services/appointmentService';
 import { clientService } from '../../../services/clientService';
 import { procedureService } from '../../../services/procedureService';
 import { useAuth } from '../../../Auth/AuthContext';
-import { AppointmentDTO, ClientDTO, Procedimento } from '../../../types';
+import { AppointmentDTO, ClientDTO, ProcedimentoDTO } from '../../../types';
 import { mapStatusToBackend } from '../../../utils/appointmentUtils';
 
 export interface ConsultaFormData {
@@ -22,7 +22,7 @@ export const NewConsultasPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [clients, setClients] = useState<ClientDTO[]>([]);
-  const [procedures, setProcedures] = useState<Procedimento[]>([]);
+  const [procedures, setProcedures] = useState<ProcedimentoDTO[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [formData, setFormData] = useState<ConsultaFormData>({

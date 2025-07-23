@@ -10,6 +10,11 @@ import { PrivateRoute } from './Auth/PrivateRoute';
 import { NewProcedurePage } from './components/procedimentos/new';
 import { ProcedurePage } from './components/procedimentos/list';
 import { EditProcedurePage } from './components/procedimentos/edit';
+import { ClientPage } from './components/clientes/list';
+import { NewClientPage } from './components/clientes/new';
+import { EditClientPage } from './components/clientes/edit';
+import { SettingsPage } from './components/configuracoes';
+
 function App() {
   return (
     <BrowserRouter>
@@ -18,12 +23,28 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/estheticians" element={<EstheticianForm />} />
+      <Route path="/clients" element={
+        <PrivateRoute>
+          <ClientPage />
+        </PrivateRoute>
+      } />
+      <Route path="/clients/new" element={
+        <PrivateRoute>
+          <NewClientPage />
+        </PrivateRoute>
+      } />
+      <Route path="/clients/edit/:cpf" element={
+        <PrivateRoute>
+          <EditClientPage />
+        </PrivateRoute>
+      } />
+    
       <Route path="/procedure" element={
         <PrivateRoute>
           <ProcedurePage />
         </PrivateRoute>
       } />
-      <Route path="/procedure/edit" element={
+      <Route path="/procedure/edit/:name" element={
         <PrivateRoute>
           <EditProcedurePage />
         </PrivateRoute>
@@ -51,6 +72,11 @@ function App() {
       <Route path="/home" element={
         <PrivateRoute>
           <HomePage />
+        </PrivateRoute>
+      } />
+      <Route path="/settings" element={
+        <PrivateRoute>
+          <SettingsPage />
         </PrivateRoute>
       } />
     </Routes>

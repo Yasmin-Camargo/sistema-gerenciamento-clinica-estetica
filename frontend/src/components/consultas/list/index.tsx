@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { StandardPage } from '../../listPadrao';  
-import { ConsultaStyles } from './styles';
+import { TableStyles } from '../../tableStyles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { AppointmentDTO } from '../../../types';
@@ -16,9 +16,8 @@ export const ConsultasPage: React.FC = () => {
   const [procedimentoFiltro, setProcedimentoFiltro] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
-  const [consultaSelecionada, setConsultaSelecionada] = useState<any>(null);
+  const [consultaSelecionada, setConsultaSelecionada] = useState<ReturnType<typeof formatAppointmentForDisplay> | null>(null);
 
-  // Carrega as consultas ao montar o componente
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -35,15 +34,13 @@ export const ConsultasPage: React.FC = () => {
     }
   };
 
-  const excluirConsulta = (consultaFormatada: any) => {
+  const excluirConsulta = (consultaFormatada: ReturnType<typeof formatAppointmentForDisplay>) => {
     setConsultaSelecionada(consultaFormatada);
     setModalAberto(true);
   };
 
   const editarConsulta = (appointment: AppointmentDTO) => {
-    // Navegar para a página de edição com o ID do appointment
-    console.log('Editar consulta:', appointment);
-    // TODO: implementar navegação para página de edição
+    navigate(`/consultas/${appointment.client.cpf}/${appointment.dateTime}`);
   };  
   
   const confirmarRemocao = async () => {
@@ -129,7 +126,7 @@ export const ConsultasPage: React.FC = () => {
       onButtonClick={navigateNovaConsulta}
       filters={filtros}
     >
-      <ConsultaStyles>
+      <TableStyles>
         <table className="table">
           <thead>
             <tr>
@@ -181,7 +178,7 @@ export const ConsultasPage: React.FC = () => {
             )}
           </tbody>
         </table>
-      </ConsultaStyles>
+      </TableStyles>
 
       <RemoveModal
         isOpen={modalAberto}

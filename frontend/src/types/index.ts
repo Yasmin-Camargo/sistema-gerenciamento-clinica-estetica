@@ -30,16 +30,15 @@ export interface AppointmentDTO {
   status: AppointmentStatus;
   proceduresName: string[];
 }
-
-export interface Consulta {
-  data: string;
+export interface ConsultaDTO {
+  data: string;         // poderia ser Date | string dependendo do uso
   cliente: string;
   status: 'Pendente' | 'Concluída' | 'Cancelada' | string;
   procedimentos: string;
   valor: string;
 }
 
-export interface Procedimento {
+export interface ProcedimentoDTO {
   name: string;
   description: string;
   estimatedDuration: number;
@@ -54,4 +53,3 @@ export interface ClientDTO {
   email: string;
   address?: string;
 }
-
