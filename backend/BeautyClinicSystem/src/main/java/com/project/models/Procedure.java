@@ -1,8 +1,6 @@
 package com.project.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,4 +20,8 @@ public class Procedure {
     private Integer estimatedDuration;
 
     private Double cost;
+
+    @ManyToOne
+    @JoinColumn(name = "esthetician_cpf", nullable = false)
+    private Esthetician esthetician;
 }

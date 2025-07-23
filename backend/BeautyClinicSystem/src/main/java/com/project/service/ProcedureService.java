@@ -4,6 +4,7 @@ import com.project.dto.ProcedureDTO;
 import com.project.mappers.ProcedureMapper;
 import com.project.models.Procedure;
 import com.project.repositories.ProcedureRepository;
+import com.project.security.AuthService;
 import com.project.specification.ProcedureSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,25 +14,28 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Service
 @RequiredArgsConstructor
 public class ProcedureService {
-
     private final ProcedureRepository procedureRepository;
+    private final AuthService authService;
 
     @Transactional(readOnly = true)
     public List<ProcedureDTO> listAll() {
-        return procedureRepository.findAll().stream()
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        Specification<Procedure> spec = ProcedureSpecification.byEsthetician(loggedInEstheticianCpf);
+
+        return procedureRepository.findAll(spec).stream()
                 .map(ProcedureMapper::fromEntityToDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ProcedureDTO> filterProcedures(String name) {
-        Specification<Procedure> spec = Specification.where(null);
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        Specification<Procedure> spec = ProcedureSpecification.byEsthetician(loggedInEstheticianCpf);
 
         if (name != null && !name.isBlank()) {
             spec = spec.and(ProcedureSpecification.nameContains(name));
@@ -46,6 +50,7 @@ public class ProcedureService {
     @Transactional(readOnly = true)
     public ProcedureDTO findByName(String name) {
         Procedure procedure = procedureRepository.findById(name)
+                .filter(a -> a.getEsthetician().getCpf().equals(authService.getLoggedInEstheticianCpf()))
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "procedure-not-found"));
         return ProcedureMapper.fromEntityToDto(procedure);
     }
@@ -57,14 +62,20 @@ public class ProcedureService {
         }
 
         Procedure entity = ProcedureMapper.fromDtoToEntity(createDTO);
+        entity.setEsthetician(authService.getLoggedInEsthetician());
         Procedure savedEntity = procedureRepository.save(entity);
         return ProcedureMapper.fromEntityToDto(savedEntity);
     }
 
     @Transactional
     public ProcedureDTO update(String name, ProcedureDTO updateDTO) {
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
         Procedure entity = procedureRepository.findById(name)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "procedure-not-found"));
+
+        if (!entity.getEsthetician().getCpf().equals(loggedInEstheticianCpf)) {
+            throw new ResponseStatusException(FORBIDDEN, "cannot-update-procedure-for-another-esthetician");
+        }
 
         entity.setDescription(updateDTO.description());
         entity.setEstimatedDuration(updateDTO.estimatedDuration());
@@ -76,9 +87,14 @@ public class ProcedureService {
 
     @Transactional
     public void delete(String name) {
-        if (!procedureRepository.existsById(name)) {
-            throw new ResponseStatusException(NOT_FOUND, "procedure-not-found");
+        String loggedInEstheticianCpf = authService.getLoggedInEstheticianCpf();
+        Procedure procedure = procedureRepository.findById(name)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "procedure-not-found"));
+
+        if (!procedure.getEsthetician().getCpf().equals(loggedInEstheticianCpf)) {
+            throw new ResponseStatusException(FORBIDDEN, "cannot-delete-procedure-for-another-esthetician");
         }
+
         procedureRepository.deleteById(name);
     }
 }

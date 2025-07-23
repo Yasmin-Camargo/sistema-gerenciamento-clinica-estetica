@@ -21,6 +21,18 @@ databaseChangeLog:
               - column:
                   name: cost
                   type: DECIMAL(10,2)
+              - column:
+                  name: esthetician_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: procedure
+            baseColumnNames: esthetician_cpf
+            referencedTableName: esthetician
+            referencedColumnNames: cpf
+            constraintName: fk_procedure_esthetician
 
         - createTable:
             tableName: appointment

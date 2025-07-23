@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, String>, JpaSpecificationExecutor<Client> {
+    long countByEstheticianCpf(String estheticianCpf);
 }

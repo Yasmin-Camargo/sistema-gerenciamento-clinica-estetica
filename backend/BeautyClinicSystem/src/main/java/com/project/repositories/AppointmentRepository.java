@@ -13,17 +13,28 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, AppointmentId>, JpaSpecificationExecutor<Appointment> {
+
+    @Query("""
+       SELECT COUNT(a) FROM Appointment a
+       WHERE a.id.estheticianCpf = :estheticianCpf
+    """)
+    long countByEstheticianCpf(@Param("estheticianCpf") String estheticianCpf);
+
     @Query("""
        SELECT a FROM Appointment a
-       WHERE a.id.dateTime >= :now
+       WHERE a.id.dateTime >= :now 
+            AND a.id.estheticianCpf = :estheticianCpf
        ORDER BY a.id.dateTime ASC
     """)
-    List<Appointment> findNextAppointments(@Param("now") OffsetDateTime now);
+    List<Appointment> findNextAppointments(@Param("now") OffsetDateTime now,
+                                           @Param("estheticianCpf") String estheticianCpf);
 
     @Query("""
        SELECT SUM(a.value)
        FROM Appointment a
        WHERE a.status = :status
+            AND a.id.estheticianCpf = :estheticianCpf
     """)
-    Double getTotalRevenueFromCompletedAppointments(@Param("status") com.project.models.AppointmentStatus status);
+    Double getTotalRevenueFromCompletedAppointments(@Param("status") com.project.models.AppointmentStatus status,
+                                                    @Param("estheticianCpf") String estheticianCpf);
 }
