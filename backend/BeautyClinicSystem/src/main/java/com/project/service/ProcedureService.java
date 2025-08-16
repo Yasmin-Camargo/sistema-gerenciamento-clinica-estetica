@@ -3,7 +3,10 @@ package com.project.service;
 import com.project.dto.ProcedureDTO;
 import com.project.mappers.ProcedureMapper;
 import com.project.models.Procedure;
+import com.project.models.Product;
+import com.project.repositories.EstheticianRepository;
 import com.project.repositories.ProcedureRepository;
+import com.project.repositories.ProductRepository;
 import com.project.security.AuthService;
 import com.project.specification.ProcedureSpecification;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,8 @@ import static org.springframework.http.HttpStatus.*;
 public class ProcedureService {
     private final ProcedureRepository procedureRepository;
     private final AuthService authService;
+    private final EstheticianRepository estheticianRepository;
+    private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
     public List<ProcedureDTO> listAll() {
@@ -61,8 +66,15 @@ public class ProcedureService {
             throw new ResponseStatusException(BAD_REQUEST, "procedure-already-registered");
         }
 
-        Procedure entity = ProcedureMapper.fromDtoToEntity(createDTO);
-        entity.setEsthetician(authService.getLoggedInEsthetician());
+        List<Product> products = productRepository.findAllById(
+                createDTO.products().stream().map(p -> p.id()).toList()
+        );
+        if (products.size() != createDTO.products().size()) {
+            throw new ResponseStatusException(BAD_REQUEST, "one-or-more-products-not-found");
+        }
+
+        Procedure entity = ProcedureMapper.fromDtoToEntity(createDTO, products);
+        entity.setEsthetician(estheticianRepository.getReferenceById(authService.getLoggedInEstheticianCpf()));
         Procedure savedEntity = procedureRepository.save(entity);
         return ProcedureMapper.fromEntityToDto(savedEntity);
     }

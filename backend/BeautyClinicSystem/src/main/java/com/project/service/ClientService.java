@@ -4,6 +4,7 @@ import com.project.dto.ClientDTO;
 import com.project.mappers.ClientMapper;
 import com.project.models.Client;
 import com.project.repositories.ClientRepository;
+import com.project.repositories.EstheticianRepository;
 import com.project.security.AuthService;
 import com.project.specification.ClientSpecification;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final AuthService authService;
+    private final EstheticianRepository estheticianRepository;
 
     @Transactional(readOnly = true)
     public List<ClientDTO> listAll() {
@@ -66,7 +68,7 @@ public class ClientService {
         }
 
         Client entity = ClientMapper.fromDtoToEntity(createDTO);
-        entity.setEsthetician(authService.getLoggedInEsthetician());
+        entity.setEsthetician(estheticianRepository.getReferenceById(authService.getLoggedInEstheticianCpf()));
         Client savedEntity = clientRepository.save(entity);
         return ClientMapper.fromEntityToDto(savedEntity);
     }

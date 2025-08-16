@@ -5,34 +5,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "procedure")
-public class Procedure {
-
+@Table(name = "product")
+public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
 
     private String description;
 
-    private Integer estimatedDuration;
+    private String type;
 
-    private Double cost;
+    @ManyToMany(mappedBy = "products")
+    private Set<Procedure> procedures;
 
     @ManyToOne
     @JoinColumn(name = "esthetician_cpf", nullable = false)
     private Esthetician esthetician;
-
-    @ManyToMany
-    @JoinTable(
-            name = "procedure_product",
-            joinColumns = @JoinColumn(name = "procedure_name"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products;
 }

@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/1-add-person-client-and-esthetician-tables.yaml
   - include:
       file: db/changelog/2-add-procedure-and-appointment-tables.yaml
+  - include:
+      file: db/changelog/3-add-product-and-health-record-tables.yaml
