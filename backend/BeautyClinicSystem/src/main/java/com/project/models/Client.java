@@ -27,4 +27,7 @@ public class Client extends Person{
     @ManyToOne
     @JoinColumn(name = "esthetician_cpf", nullable = false)
     private Esthetician esthetician;
+
+    @OneToOne(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private HealthRecord healthRecord;
 }

@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-health-record-table
+      author: yasmin
+      changes:
+        - createTable:
+            tableName: health_record
+            columns:
+              - column:
+                  name: client_cpf
+                  type: VARCHAR(14)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_health_record_client
+                    references: client(cpf)
+              - column:
+                  name: allergies
+                  type: TEXT
+              - column:
+                  name: medications
+                  type: TEXT
+              - column:
+                  name: blood_type
+                  type: VARCHAR(5)
+              - column:
+                  name: chronic_diseases
+                  type: TEXT
+              - column:
+                  name: skin_type
+                  type: VARCHAR(100)
+              - column:
+                  name: observations
+                  type: TEXT
+              - column:
+                  name: height
+                  type: DECIMAL(3,2)
+              - column:
+                  name: weight
+                  type: DECIMAL(5,2)
+              - column:
+                  name: imc
+                  type: DECIMAL(4,2)
+              - column:
+                  name: previous_procedures
+                  type: TEXT
+              - column:
+                  name: phototype
+                  type: VARCHAR(50)
+              - column:
+                  name: last_updated
+                  type: TIMESTAMP WITH TIME ZONE

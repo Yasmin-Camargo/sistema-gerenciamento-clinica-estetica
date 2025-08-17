@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: add-product-and-health-record-tables
+      id: add-product-table
       author: yasmin
       changes:
         - createTable:

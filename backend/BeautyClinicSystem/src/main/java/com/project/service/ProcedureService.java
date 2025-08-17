@@ -1,6 +1,7 @@
 package com.project.service;
 
 import com.project.dto.ProcedureDTO;
+import com.project.dto.ProductReferenceDTO;
 import com.project.mappers.ProcedureMapper;
 import com.project.models.Procedure;
 import com.project.models.Product;
@@ -66,10 +67,10 @@ public class ProcedureService {
             throw new ResponseStatusException(BAD_REQUEST, "procedure-already-registered");
         }
 
-        List<Product> products = productRepository.findAllById(
-                createDTO.products().stream().map(p -> p.id()).toList()
-        );
-        if (products.size() != createDTO.products().size()) {
+        List<Product> products = createDTO.products() != null
+                ? productRepository.findAllById(createDTO.products().stream().map(ProductReferenceDTO::id).toList())
+                : List.of();
+        if (createDTO.products() != null && (products.size() != createDTO.products().size())) {
             throw new ResponseStatusException(BAD_REQUEST, "one-or-more-products-not-found");
         }
 
