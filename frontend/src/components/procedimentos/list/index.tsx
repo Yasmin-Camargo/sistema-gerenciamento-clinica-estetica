@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StandardPage } from '../../listPadrao';  
 import { TableStyles } from '../../tableStyles';
 import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { ProcedimentoDTO } from '../../../types';
 import { procedureService } from '../../../services/procedureService';
-import api from '../../../api/api';
 
 export const ProcedurePage: React.FC = () => {
   const [procedimentos, setProcedimentos] = useState<ProcedimentoDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [modalAberto, setModalAberto] = useState(false);
   const [procedimentoSelecionado, setProcedimentoSelecionado] = useState<ProcedimentoDTO | null>(null);
   const [busca, setBusca] = useState('');
@@ -23,13 +21,11 @@ export const ProcedurePage: React.FC = () => {
 
   const fetchProcedures = async () => {
     setLoading(true);
-    setError(null);
     try {
       const data = await procedureService.listAll();
       setProcedimentos(data);
     } catch (err) {
-      setError('Erro ao carregar procedimentos.');
-      console.error(err);
+      console.error('Erro ao carregar procedimentos.', err);
     } finally {
       setLoading(false);
     }
@@ -118,13 +114,14 @@ export const ProcedurePage: React.FC = () => {
               <th>Descrição</th>
               <th>Duração Estimada (min)</th>
               <th>Custo (R$)</th>
+              <th>Produtos</th>
               <th>Ações</th>
             </tr>
           </thead>
             <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5}>Carregando procedimentos...</td>
+                <td colSpan={6}>Carregando procedimentos...</td>
               </tr>
             ) : procedimentos.length > 0 ? (
               procedimentos.map((proc) => (
@@ -133,6 +130,11 @@ export const ProcedurePage: React.FC = () => {
                   <td>{truncate(proc.description, 50)}</td>
                   <td>{proc.estimatedDuration}</td>
                   <td>{proc.cost.toFixed(2)}</td>
+                  <td>
+                    {proc.products && proc.products.length > 0
+                      ? proc.products.map(p => p.name).join(', ')
+                      : '-'}
+                  </td>
                   <td className="action-cell">
                     <button
                       className="action-button"
@@ -151,7 +153,7 @@ export const ProcedurePage: React.FC = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={5}>Nenhum procedimento encontrado.</td>
+                <td colSpan={6}>Nenhum procedimento encontrado.</td>
               </tr>
             )}
           </tbody>
