@@ -200,4 +200,17 @@ export const Content = styled.div<ContentProps>`
     cursor: pointer;
   }
 
+  .new-health-record {
+  background-color: #401808;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .new-health-record:hover {
+    background-color: #a75d16;
+  }
 `;

@@ -59,3 +59,26 @@ export interface ClientDTO {
   email: string;
   address?: string;
 }
+
+export interface ProductDTO {
+  id: number;
+  name: string;
+  description: string;
+  type: string;
+}
+
+export interface HealthRecordDTO {
+  clientCPF: string;
+  allergies?: string[];
+  medications?: string[];
+  bloodType?: string;
+  chronicDiseases?: string[];
+  skinType?: string; 
+  observations?: string;
+  height?: number;
+  weight?: number;
+  imc?: number;
+  previousProcedures?: string[];
+  phototype?: string;
+  offSetDataTime?: string;
+}

@@ -23,6 +23,7 @@ export const NewClientPage: React.FC = () => {
     email: '',
     address: '',
   });
+  const [clientSaved, setClientSaved] = useState<ClientDTO | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,12 +36,18 @@ export const NewClientPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await clientService.create(formData as ClientDTO);
+      const savedClient = await clientService.create(formData as ClientDTO);
       alert('Cliente cadastrado com sucesso!');
-      navigate('/clients');
+      setClientSaved(savedClient); // guarda cliente cadastrado
     } catch (error) {
       console.error('Erro ao cadastrar cliente:', error);
       alert('Erro ao cadastrar cliente. Verifique os dados e tente novamente.');
+    }
+  };
+
+  const navigateToNewHealthRecord = () => {
+    if (clientSaved) {
+      navigate(`/health-records/new`); 
     }
   };
 
@@ -129,6 +136,14 @@ export const NewClientPage: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {clientSaved && (
+        <div className="new-health-record">
+          <button className="btn-submit" onClick={navigateToNewHealthRecord}>
+            + Nova Ficha de Saúde
+          </button>
+        </div>
+      )}
     </StandardPage>
   );
 };
