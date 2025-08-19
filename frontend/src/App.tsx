@@ -14,7 +14,11 @@ import { ClientPage } from './components/clientes/list';
 import { NewClientPage } from './components/clientes/new';
 import { EditClientPage } from './components/clientes/edit';
 import { SettingsPage } from './components/configuracoes';
-import { ProductsPage } from './components/produtos';
+import { ListProductsPage } from './components/produtos/list';
+import { EditProductPage } from './components/produtos/edit';
+import { NewProductPage } from './components/produtos/new';
+import { NewHealthRecordPage } from './components/fichaDeSaude/new';
+import { ListHealthRecordPage } from './components/fichaDeSaude/list';
 
 function App() {
   return (
@@ -82,7 +86,27 @@ function App() {
       } />
       <Route path="/products" element={
         <PrivateRoute>
-          <ProductsPage />
+          <ListProductsPage />
+        </PrivateRoute>
+      } />
+      <Route path="/products/edit/:id" element={
+        <PrivateRoute>
+          <EditProductPage />
+        </PrivateRoute>
+      } />
+      <Route path="/products/new" element={
+        <PrivateRoute>
+          <NewProductPage />
+        </PrivateRoute>
+      } />
+      <Route path="/health-records/new" element={
+        <PrivateRoute>
+          <NewHealthRecordPage />
+        </PrivateRoute>
+      } />
+      <Route path="/health-records/:cpf" element={
+        <PrivateRoute>
+          <ListHealthRecordPage />
         </PrivateRoute>
       } />
     </Routes>

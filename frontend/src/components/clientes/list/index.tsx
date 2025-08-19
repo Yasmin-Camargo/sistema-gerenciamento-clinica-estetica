@@ -7,6 +7,7 @@ import { ClientDTO } from '../../../types';
 import { clientService } from '../../../services/clientService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ListHealthRecordPage } from '../../fichaDeSaude/list';
 
   export const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<ClientDTO[]>([]);
@@ -73,6 +74,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 
   const navigateToEditClient = (client: ClientDTO) => {
     navigate(`/clients/edit/${client.cpf}`);
+  };
+
+  const navigateToHealthRecords = (client: ClientDTO) => {
+    navigate(`/health-records/${client.cpf}`);
   };
 
   const openRemoveModal = (client: ClientDTO) => {
@@ -181,6 +186,12 @@ import 'react-datepicker/dist/react-datepicker.css';
                   <td>{client.phone}</td>
                   <td>{client.email}</td>
                   <td className="action-cell">
+                    <button
+                      className="action-button"
+                      onClick={() => navigateToHealthRecords(client)}
+                    >
+                      <img src="/IconFicha.png" alt="Ficha de Saúde" />
+                    </button>
                     <button
                       className="action-button"
                       onClick={() => navigateToEditClient(client)}
