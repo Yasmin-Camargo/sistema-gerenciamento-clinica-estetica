@@ -12,7 +12,7 @@ interface ContentProps {
 export const Content = styled.div<ContentProps>`
   margin-left: ${({ $sidebarOpen }) => ($sidebarOpen ? '220px' : '60px')};
   transition: margin-left 0.3s;
-  padding: 1.5rem;
+  padding: 0rem 1rem 0rem 1.0rem;
   width: 100%;
   box-sizing: border-box;
   overflow-x: auto;
@@ -210,7 +210,28 @@ export const Content = styled.div<ContentProps>`
     cursor: pointer;
     transition: background-color 0.3s;
   }
+
   .new-health-record:hover {
     background-color: #a75d16;
   }
+
+  .infos {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .infos p {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  border: 0.7px solid #a75d16;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  color: #444;
+  transition: transform 0.2s ease;
+  max-width: 340px;
+}
 `;
