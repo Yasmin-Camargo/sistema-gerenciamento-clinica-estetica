@@ -10,7 +10,7 @@ export const healthRecordService = {
 
   // Busca um registro por CPF do cliente
   getByClientCPF: async (cpf: string): Promise<HealthRecordDTO> => {
-    const response = await api.get<HealthRecordDTO>(`/health-records/client/${cpf}`);
+    const response = await api.get<HealthRecordDTO>(`/health-records/${cpf}`);
     return response.data;
   },
 
