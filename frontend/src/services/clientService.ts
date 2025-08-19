@@ -8,6 +8,11 @@ export const clientService = {
     return response.data;
   },
 
+  // Alias para compatibilidade
+  getAllClients: async (): Promise<ClientDTO[]> => {
+    return clientService.listAll();
+  },
+
   // Busca cliente por CPF
   findByCpf: async (cpf: string): Promise<ClientDTO> => {
     const response = await api.get(`/clients/${cpf}`);

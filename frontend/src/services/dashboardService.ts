@@ -16,4 +16,5 @@ export const dashboardService = {
     const response = await api.get('/dashboard/home');
     return response.data;
   }
+  
 };

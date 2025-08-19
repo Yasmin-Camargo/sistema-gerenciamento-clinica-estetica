@@ -8,6 +8,12 @@ export const procedureService = {
     return response.data;
   },
 
+  // Alias para compatibilidade
+  getAllProcedimentos: async (): Promise<ProcedimentoDTO[]> => {
+    return procedureService.listAll();
+  },
+
+
   // Busca procedimento por nome
   findByName: async (name: string): Promise<ProcedimentoDTO> => {
     const response = await api.get(`/procedures/${name}`);

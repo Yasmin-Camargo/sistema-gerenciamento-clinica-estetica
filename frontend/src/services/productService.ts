@@ -8,6 +8,10 @@ export const productService = {
     return response.data;
   },
 
+  getAllProducts: async (): Promise<ProductDTO[]> => {
+    return productService.listAll();
+  },
+
   // Busca produto por ID
   findById: async (id: number): Promise<ProductDTO> => {
     const response = await api.get(`/products/${id}`);

@@ -82,3 +82,11 @@ export interface HealthRecordDTO {
   phototype?: string;
   offSetDataTime?: string;
 }
+
+export interface ClinicInfoDTO {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+}
