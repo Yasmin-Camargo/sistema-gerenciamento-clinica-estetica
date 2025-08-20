@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
@@ -20,6 +21,7 @@ public class ClientResource {
     private final ClientService clientService;
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping
     public ResponseEntity<List<ClientDTO>> listAll() {
         List<ClientDTO> list = clientService.listAll();
@@ -27,6 +29,7 @@ public class ClientResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/filter")
     public ResponseEntity<List<ClientDTO>> filterClients(
             @RequestParam(required = false) String cpf,
@@ -41,6 +44,7 @@ public class ClientResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/{cpf}")
     public ResponseEntity<ClientDTO> findByCpf(@PathVariable String cpf) {
         ClientDTO dto = clientService.findByCpf(cpf);
@@ -48,6 +52,7 @@ public class ClientResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PostMapping
     public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO dto) {
         ClientDTO createdDto = clientService.create(dto);
@@ -55,6 +60,7 @@ public class ClientResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PutMapping("/{cpf}")
     public ResponseEntity<ClientDTO> update(@PathVariable String cpf, @Valid @RequestBody ClientDTO dto) {
         ClientDTO updatedDto = clientService.update(cpf, dto);
@@ -62,6 +68,7 @@ public class ClientResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @DeleteMapping("/{cpf}")
     public ResponseEntity<Void> delete(@PathVariable String cpf) {
         clientService.delete(cpf);

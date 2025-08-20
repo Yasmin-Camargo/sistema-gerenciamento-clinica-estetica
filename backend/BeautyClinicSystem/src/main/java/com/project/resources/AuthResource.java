@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,11 +28,13 @@ public class AuthResource {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
+    @Transactional
     public ResponseEntity<EstheticianDTO> register(@Valid @RequestBody EstheticianDTO dto) {
         return ResponseEntity.ok(estheticianService.create(dto));
     }
 
     @PostMapping("/login")
+    @Transactional(readOnly = true)
     public ResponseEntity<String> login(@Valid @RequestBody LoginDTO dto,
                                         HttpServletRequest request,
                                         HttpServletResponse response) {

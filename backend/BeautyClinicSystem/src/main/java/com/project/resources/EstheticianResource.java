@@ -3,13 +3,13 @@ package com.project.resources;
 import com.project.dto.EstheticianDTO;
 import com.project.security.EstheticianUserDetails;
 import com.project.service.EstheticianService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ public class EstheticianResource {
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
     @GetMapping("/me")
+    @Transactional(readOnly = true)
     public ResponseEntity<EstheticianDTO> getAuthenticatedUser(@AuthenticationPrincipal EstheticianUserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(401).build();
@@ -32,13 +33,14 @@ public class EstheticianResource {
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<EstheticianDTO>> listAll() {
         List<EstheticianDTO> list = estheticianService.listAll();
         return ResponseEntity.ok(list);
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
-    @Transactional
+    @Transactional(readOnly = true)
     @GetMapping("/{cpf}")
     public ResponseEntity<EstheticianDTO> findByCpf(@PathVariable String cpf) {
         EstheticianDTO dto = estheticianService.findByCpf(cpf);
@@ -46,6 +48,7 @@ public class EstheticianResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PutMapping("/{cpf}")
     public ResponseEntity<EstheticianDTO> update(@PathVariable String cpf, @Valid @RequestBody EstheticianDTO dto) {
         EstheticianDTO updatedDto = estheticianService.update(cpf, dto);
@@ -53,6 +56,7 @@ public class EstheticianResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @DeleteMapping("/{cpf}")
     public ResponseEntity<Void> delete(@PathVariable String cpf) {
         estheticianService.delete(cpf);

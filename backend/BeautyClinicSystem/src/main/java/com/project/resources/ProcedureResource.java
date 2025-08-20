@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class ProcedureResource {
     private final ProcedureService procedureService;
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping
     public ResponseEntity<List<ProcedureDTO>> listAll() {
         List<ProcedureDTO> list = procedureService.listAll();
@@ -25,6 +27,7 @@ public class ProcedureResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/filter")
     public ResponseEntity<List<ProcedureDTO>> filterProcedures(
             @RequestParam(required = false) String name
@@ -33,6 +36,7 @@ public class ProcedureResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/{name}")
     public ResponseEntity<ProcedureDTO> findByName(@PathVariable String name) {
         ProcedureDTO dto = procedureService.findByName(name);
@@ -40,6 +44,7 @@ public class ProcedureResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PostMapping
     public ResponseEntity<ProcedureDTO> create(@Valid @RequestBody ProcedureDTO dto) {
         ProcedureDTO createdDto = procedureService.create(dto);
@@ -47,6 +52,7 @@ public class ProcedureResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PutMapping("/{name}")
     public ResponseEntity<ProcedureDTO> update(@PathVariable String name, @Valid @RequestBody ProcedureDTO dto) {
         ProcedureDTO updatedDto = procedureService.update(name, dto);
@@ -54,6 +60,7 @@ public class ProcedureResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @DeleteMapping("/{name}")
     public ResponseEntity<Void> delete(@PathVariable String name) {
         procedureService.delete(name);

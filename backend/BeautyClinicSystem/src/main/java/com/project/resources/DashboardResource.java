@@ -5,6 +5,7 @@ import com.project.dto.HomePageDTO;
 import com.project.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,12 +17,14 @@ public class DashboardResource {
     private final DashboardService dashboardService;
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/summary")
     public ClinicOverviewDTO getClinicOverview() {
         return dashboardService.getSummary();
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/home")
     public HomePageDTO getHomePageData() {
         return dashboardService.getHomePageData();

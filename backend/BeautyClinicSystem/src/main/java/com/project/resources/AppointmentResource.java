@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -21,12 +22,14 @@ public class AppointmentResource {
     private final AppointmentService appointmentService;
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping
     public ResponseEntity<List<AppointmentDTO>> listAll() {
         return ResponseEntity.ok(appointmentService.listAll());
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/filter")
     public ResponseEntity<List<AppointmentDTO>> filterAppointments(
             @RequestParam(required = false) String clientName,
@@ -39,6 +42,7 @@ public class AppointmentResource {
 
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional(readOnly = true)
     @GetMapping("/{estheticianCpf}/{clientCpf}/{dateTime}")
     public ResponseEntity<AppointmentDTO> findById(
             @PathVariable String estheticianCpf,
@@ -49,12 +53,14 @@ public class AppointmentResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PostMapping
     public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentDTO dto) {
         return ResponseEntity.ok(appointmentService.create(dto));
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @PutMapping("/{estheticianCpf}/{clientCpf}/{dateTime}")
     public ResponseEntity<AppointmentDTO> update(
             @PathVariable String estheticianCpf,
@@ -66,6 +72,7 @@ public class AppointmentResource {
     }
 
     @PreAuthorize("hasRole('ESTHETICIAN')")
+    @Transactional
     @DeleteMapping("/{estheticianCpf}/{clientCpf}/{dateTime}")
     public ResponseEntity<Void> delete(
             @PathVariable String estheticianCpf,
