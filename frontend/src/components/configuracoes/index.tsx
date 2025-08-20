@@ -177,7 +177,7 @@ export const SettingsPage: React.FC = () => {
   const logout = (
     <StandardPage title="">
       <div className="esthetician-header">
-        <h3>Excluir clínica</h3>
+        <h3>Excluir dados da clínica</h3>
         <button
           className="action-button"
           onClick={() => setShowRemoveModal(true)}
