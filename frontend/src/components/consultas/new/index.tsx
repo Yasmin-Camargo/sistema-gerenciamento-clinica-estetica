@@ -7,6 +7,7 @@ import { procedureService } from '../../../services/procedureService';
 import { useAuth } from '../../../Auth/AuthContext';
 import { AppointmentDTO, ClientDTO, ProcedimentoDTO } from '../../../types';
 import { mapStatusToBackend } from '../../../utils/appointmentUtils';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export interface ConsultaFormData {
   date: string;
@@ -49,8 +50,7 @@ export const NewConsultasPage: React.FC = () => {
       setClients(clientsData);
       setProcedures(proceduresData);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-      alert('Erro ao carregar clientes e procedimentos');
+      notifyError(error, 'Erro ao carregar clientes e procedimentos.');
     } finally {
       setLoading(false);
     }
@@ -77,32 +77,32 @@ export const NewConsultasPage: React.FC = () => {
     e.preventDefault();
 
     if (!user) {
-      alert('Usuário não autenticado');
+  notifyError(null, 'Usuário não autenticado');
       return;
     }
 
     if (formData.proceduresName.length === 0) {
-      alert('Selecione pelo menos um procedimento');
+  notifyError(null, 'Selecione pelo menos um procedimento');
       return;
     }
 
     if (!formData.date || !formData.time) {
-      alert('Data e hora são obrigatórios');
+  notifyError(null, 'Data e hora são obrigatórios');
       return;
     }
 
     if (!formData.clientCpf) {
-      alert('Selecione um cliente');
+  notifyError(null, 'Selecione um cliente');
       return;
     }
 
     if (!formData.status) {
-      alert('Selecione um status');
+  notifyError(null, 'Selecione um status');
       return;
     }
 
     if (!formData.value || parseFloat(formData.value) <= 0) {
-      alert('Valor deve ser maior que zero');
+  notifyError(null, 'Valor deve ser maior que zero');
       return;
     }
 
@@ -111,7 +111,7 @@ export const NewConsultasPage: React.FC = () => {
       
       const selectedClient = clients.find(client => client.cpf === formData.clientCpf);
       if (!selectedClient) {
-        alert('Cliente não encontrado');
+        notifyError(null, 'Cliente não encontrado');
         return;
       }
 
@@ -138,20 +138,10 @@ export const NewConsultasPage: React.FC = () => {
 
       const response = await appointmentService.create(appointmentData);
       console.log('Consulta criada com sucesso:', response);
-      alert('Consulta cadastrada com sucesso!');
+      notifySuccess('Consulta cadastrada com sucesso!');
       navigate('/consultas');
     } catch (error: any) {
-      console.error('Erro completo ao cadastrar consulta:', error);
-      console.error('Response data:', error.response?.data);
-      console.error('Response status:', error.response?.status);
-      
-      if (error.response?.data?.message) {
-        alert(`Erro: ${error.response.data.message}`);
-      } else if (error.response?.data) {
-        alert(`Erro: ${JSON.stringify(error.response.data)}`);
-      } else {
-        alert('Erro ao cadastrar consulta. Verifique os dados e tente novamente.');
-      }
+      notifyError(error, 'Erro ao cadastrar consulta. Verifique os dados e tente novamente.');
     }
   };
 

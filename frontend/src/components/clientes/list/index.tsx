@@ -7,6 +7,7 @@ import { ClientDTO } from '../../../types';
 import { clientService } from '../../../services/clientService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<ClientDTO[]>([]);
@@ -35,7 +36,7 @@ export const ClientPage: React.FC = () => {
       setClients(data);
     } catch (err) {
       setError('Erro ao carregar clientes.');
-      console.error(err);
+      notifyError(err, 'Erro ao carregar clientes.');
     } finally {
       setLoading(false);
     }
@@ -61,7 +62,7 @@ export const ClientPage: React.FC = () => {
       setClients(data);
     } catch (err) {
       setError('Erro ao filtrar clientes.');
-      console.error(err);
+      notifyError(err, 'Erro ao filtrar clientes.');
     } finally {
       setLoading(false);
     }
@@ -88,11 +89,10 @@ export const ClientPage: React.FC = () => {
       if (!selectedClient) return;
       try {
         await clientService.delete(selectedClient.cpf);
-        alert('Cliente removido com sucesso!');
+        notifySuccess('Cliente removido com sucesso!');
         await fetchClientsFiltered(); 
       } catch (err) {
-        alert('Erro ao remover cliente.');
-        console.error(err);
+        notifyError(err, 'Erro ao remover cliente.');
       } finally {
         setModalOpen(false);
         setSelectedClient(null);

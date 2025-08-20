@@ -6,6 +6,7 @@ import { RemoveModal } from '../../removeModal';
 import { AppointmentDTO } from '../../../types';
 import { appointmentService } from '../../../services/appointmentService';
 import { formatAppointmentForDisplay, mapStatusToBackend } from '../../../utils/appointmentUtils';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export const ConsultasPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const ConsultasPage: React.FC = () => {
       const data = await appointmentService.listAll();
       setAppointments(data);
     } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+  notifyError(error, 'Erro ao carregar consultas.');
     } finally {
       setLoading(false);
     }
@@ -54,15 +55,10 @@ export const ConsultasPage: React.FC = () => {
           appointment.dateTime
         );
         
-        await loadAppointments();
-        alert('Consulta removida com sucesso!');
+  await loadAppointments();
+  notifySuccess('Consulta removida com sucesso!');
       } catch (error: any) {
-        console.error('Erro ao remover consulta:', error);
-        if (error.response?.data?.message) {
-          alert(`Erro ao remover consulta: ${error.response.data.message}`);
-        } else {
-          alert('Erro ao remover consulta. Tente novamente.');
-        }
+  notifyError(error, 'Erro ao remover consulta. Tente novamente.');
       }
     } 
     setModalAberto(false);
@@ -84,7 +80,7 @@ export const ConsultasPage: React.FC = () => {
       const data = await appointmentService.filter(filters);
       setAppointments(data);
     } catch (error) {
-      console.error('Erro ao filtrar consultas:', error);
+  notifyError(error, 'Erro ao filtrar consultas.');
       setAppointments([]);
     } finally {
       setLoading(false);

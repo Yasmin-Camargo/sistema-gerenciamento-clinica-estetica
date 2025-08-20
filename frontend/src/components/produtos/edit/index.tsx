@@ -3,6 +3,7 @@ import { StandardPage } from '../../listPadrao';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productService } from '../../../services/productService';
 import { ProductDTO } from '../../../types';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export const EditProductPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export const EditProductPage: React.FC = () => {
         const product = await productService.findById(Number(id));
         setFormData(product);
       } catch (error) {
-        alert('Erro ao carregar dados do produto.');
+        notifyError(error, 'Erro ao carregar dados do produto.');
         navigate('/products');
       } finally {
         setLoading(false);
@@ -43,11 +44,10 @@ export const EditProductPage: React.FC = () => {
     e.preventDefault();
     try {
       await productService.update(formData.id, formData);
-      alert('Produto atualizado com sucesso!');
+      notifySuccess('Produto atualizado com sucesso!');
       navigate('/products');
     } catch (error) {
-      console.error('Erro ao atualizar produto:', error);
-      alert('Erro ao atualizar produto. Verifique os dados e tente novamente.');
+      notifyError(error, 'Erro ao atualizar produto. Verifique os dados e tente novamente.');
     }
   };
 

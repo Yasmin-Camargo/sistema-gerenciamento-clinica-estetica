@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StandardPage } from '../../listPadrao';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../../../services/productService';
 import { ProductDTO } from '../../../types';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export interface ProductFormData {
   name: string;
@@ -18,19 +19,7 @@ export const NewProductPage: React.FC = () => {
     type: '',
   });
 
-  const [types, setTypes] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        const response = await productService.getTypes(); 
-        setTypes(response);
-      } catch (error) {
-        console.error('Erro ao buscar tipos de produto:', error);
-      }
-    };
-    fetchTypes();
-  }, []);
+  // Campo 'type' é texto livre; sem carregamento de tipos
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -44,11 +33,10 @@ export const NewProductPage: React.FC = () => {
     e.preventDefault();
     try {
       await productService.create(formData as ProductDTO);
-      alert('Produto cadastrado com sucesso!');
+      notifySuccess('Produto cadastrado com sucesso!');
       navigate('/products');
     } catch (error) {
-      console.error('Erro ao cadastrar produto:', error);
-      alert('Erro ao cadastrar produto. Verifique os dados e tente novamente.');
+      notifyError(error, 'Erro ao cadastrar produto. Verifique os dados e tente novamente.');
     }
   };
 
@@ -79,18 +67,13 @@ export const NewProductPage: React.FC = () => {
 
         <div className="field">
           <label>Tipo</label>
-          <select name="type" value={formData.type} onChange={handleChange}>
-            {types.length === 0 ? (
-              <option value="">Nenhum</option>
-            ) : (
-              <>
-                <option value="">Selecione um tipo</option>
-                {types.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </>
-            )}
-          </select>
+          <input
+            type="text"
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            placeholder="Tipo do produto"
+          />
         </div>
 
         <div className="actions">

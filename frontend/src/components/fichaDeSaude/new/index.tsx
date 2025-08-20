@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { healthRecordService } from '../../../services/healthRecordService';
 import { HealthRecordDTO } from '../../../types';
 import { StandardPage } from '../../listPadrao';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export const NewHealthRecordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -47,18 +48,18 @@ export const NewHealthRecordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!record.clientCPF) {
-      alert('CPF do cliente é obrigatório para criar a ficha de saúde.');
+  notifyError(null, 'CPF do cliente é obrigatório para criar a ficha de saúde.');
       return;
     }
     const round2 = (n: number | undefined) => (typeof n === 'number' ? Math.round(n * 100) / 100 : n);
     const height = round2(record.height || 0) as number;
     const weight = round2(record.weight || 0) as number;
     if (height <= 0 || height >= 3) {
-      alert('Altura inválida. Informe em metros (ex.: 1.70) e menor que 3.00.');
+  notifyError(null, 'Altura inválida. Informe em metros (ex.: 1.70) e menor que 3.00.');
       return;
     }
     if (weight <= 0 || weight > 200) {
-      alert('Peso inválido. Informe um valor entre 0.01 kg e 200.00 kg.');
+  notifyError(null, 'Peso inválido. Informe um valor entre 0.01 kg e 200.00 kg.');
       return;
     }
     const imc = round2(weight / (height * height)) as number;
@@ -70,9 +71,10 @@ export const NewHealthRecordPage: React.FC = () => {
     };
     try {
       await healthRecordService.create(normalizedRecord.clientCPF, normalizedRecord);
+      notifySuccess('Ficha de saúde salva com sucesso!');
       navigate('/clients');
     } catch (err) {
-      console.error('Erro ao salvar registro de saúde', err);
+      notifyError(err, 'Erro ao salvar registro de saúde.');
     } finally {
     }
   };

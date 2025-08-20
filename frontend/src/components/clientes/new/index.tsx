@@ -3,6 +3,7 @@ import { StandardPage } from '../../listPadrao';
 import { useNavigate } from 'react-router-dom';
 import { clientService } from '../../../services/clientService';
 import { ClientDTO } from '../../../types';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export interface ClientFormData {
   cpf: string;
@@ -37,11 +38,10 @@ export const NewClientPage: React.FC = () => {
     e.preventDefault();
     try {
       const savedClient = await clientService.create(formData as ClientDTO);
-      alert('Cliente cadastrado com sucesso!');
+      notifySuccess('Cliente cadastrado com sucesso!');
       setClientSaved(savedClient); // guarda cliente cadastrado
     } catch (error) {
-      console.error('Erro ao cadastrar cliente:', error);
-      alert('Erro ao cadastrar cliente. Verifique os dados e tente novamente.');
+      notifyError(error, 'Erro ao cadastrar cliente. Verifique os dados e tente novamente.');
     }
   };
 

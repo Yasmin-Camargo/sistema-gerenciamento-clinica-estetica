@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { ProcedimentoDTO } from '../../../types';
 import { procedureService } from '../../../services/procedureService';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export const ProcedurePage: React.FC = () => {
   const [procedimentos, setProcedimentos] = useState<ProcedimentoDTO[]>([]);
@@ -25,7 +26,7 @@ export const ProcedurePage: React.FC = () => {
       const data = await procedureService.listAll();
       setProcedimentos(data);
     } catch (err) {
-      console.error('Erro ao carregar procedimentos.', err);
+  notifyError(err, 'Erro ao carregar procedimentos.');
     } finally {
       setLoading(false);
     }
@@ -53,13 +54,9 @@ export const ProcedurePage: React.FC = () => {
         await procedureService.delete(procedimentoSelecionado.name);
         setModalAberto(false);
         setProcedimentos((prev) => prev.filter((p) => p.name !== procedimentoSelecionado.name));
+        notifySuccess('Procedimento removido com sucesso!');
       } catch (error: any) {
-        console.error('Erro ao remover procedimento:', error);
-        if (error.response?.data?.message) {
-          alert(`Erro ao remover procedimento: ${error.response.data.message}`);
-        } else {
-          alert('Erro ao remover procedimento. Tente novamente.');
-        }
+        notifyError(error, 'Erro ao remover procedimento. Tente novamente.');
       }
     };
 
@@ -87,7 +84,7 @@ export const ProcedurePage: React.FC = () => {
       });
       setProcedimentos(filtrados);
     } catch (err) {
-      console.error('Erro ao filtrar procedimentos', err);
+      notifyError(err, 'Erro ao filtrar procedimentos.');
       setProcedimentos([]);
     } finally {
       setLoading(false);

@@ -6,6 +6,7 @@ import { RemoveModal } from '../../removeModal';
 import { ProductDTO } from '../../../types';
 import { productService } from '../../../services/productService';
 import 'react-datepicker/dist/react-datepicker.css';
+import { notifyError } from '../../../utils/errorUtils';
 
 export const ListProductsPage: React.FC = () => {
   const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -15,7 +16,6 @@ export const ListProductsPage: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO | null>(null);
   const navigate = useNavigate();
 
-  const [filterType, setFilterType] = useState<string>('');
   const [filterName, setFilterName] = useState<string>('');
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export const ListProductsPage: React.FC = () => {
       setProducts(data);
     } catch (err) {
       setError('Erro ao carregar produtos.');
-      console.error(err);
+      notifyError(err, 'Erro ao carregar produtos.');
     } finally {
       setLoading(false);
     }
@@ -43,16 +43,14 @@ export const ListProductsPage: React.FC = () => {
       // Fallback: filtra no frontend para evitar erro 400 em /products/filter no backend
       const all = await productService.listAll();
       const nameTerm = (filterName || '').toLowerCase().trim();
-      const typeTerm = (filterType || '').trim();
       const filtered = all.filter(p => {
         const matchName = !nameTerm || p.name.toLowerCase().includes(nameTerm);
-        const matchType = !typeTerm || p.type === typeTerm;
-        return matchName && matchType;
+        return matchName;
       });
       setProducts(filtered);
     } catch (err) {
       setError('Erro ao carregar produtos filtrados.');
-      console.error(err);
+      notifyError(err, 'Erro ao carregar produtos filtrados.');
     } finally {
       setLoading(false);
     }
@@ -79,7 +77,7 @@ export const ListProductsPage: React.FC = () => {
         setModalOpen(false);
       } catch (err) {
         setError('Erro ao remover produto.');
-        console.error(err);
+        notifyError(err, 'Erro ao remover produto.');
       }
     }
   };
@@ -90,8 +88,6 @@ export const ListProductsPage: React.FC = () => {
     }
   };
 
-  const tiposDisponiveis = Array.from(new Set(products.map(p => p.type)));
-
   const filtros = (
     <div className="filtros">
       <input
@@ -101,18 +97,6 @@ export const ListProductsPage: React.FC = () => {
         onChange={e => setFilterName(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <select
-        value={filterType}
-        onChange={e => setFilterType(e.target.value)}
-        onKeyDown={handleKeyDown}
-      >
-        <option value="">Todos</option>
-        {tiposDisponiveis.map((tipo) => (
-          <option key={tipo} value={tipo}>
-            {tipo}
-          </option>
-        ))}
-      </select>
       <button className="btn-submit" type="button" onClick={fetchProductsFiltered}>
         Filtrar
       </button>
@@ -121,7 +105,6 @@ export const ListProductsPage: React.FC = () => {
         type="button"
         onClick={() => {
           setFilterName('');
-          setFilterType('');
           fetchProducts();
         }}
       >
