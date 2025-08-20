@@ -99,7 +99,7 @@ function App() {
           <NewProductPage />
         </PrivateRoute>
       } />
-      <Route path="/health-records/new" element={
+  <Route path="/health-records/new/:cpf" element={
         <PrivateRoute>
           <NewHealthRecordPage />
         </PrivateRoute>

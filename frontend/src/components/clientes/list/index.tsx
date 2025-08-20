@@ -7,9 +7,8 @@ import { ClientDTO } from '../../../types';
 import { clientService } from '../../../services/clientService';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { ListHealthRecordPage } from '../../fichaDeSaude/list';
 
-  export const ClientPage: React.FC = () => {
+export const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

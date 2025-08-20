@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { healthRecordService } from '../../../services/healthRecordService';
 import { HealthRecordDTO } from '../../../types';
 import { StandardPage } from '../../listPadrao';
 
 export const NewHealthRecordPage: React.FC = () => {
   const navigate = useNavigate();
+  const { cpf } = useParams<{ cpf: string }>();
 
   const [record, setRecord] = useState<HealthRecordDTO>({
-    clientCPF: '',
+    clientCPF: cpf ?? '',
     allergies: [],
     medications: [],
     bloodType: '',
@@ -23,8 +24,13 @@ export const NewHealthRecordPage: React.FC = () => {
     offSetDataTime: new Date().toISOString(),
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Sem estados de loading/erro por enquanto; podemos adicionar feedback visual depois.
+
+  useEffect(() => {
+    if (cpf && cpf !== record.clientCPF) {
+      setRecord(prev => ({ ...prev, clientCPF: cpf }));
+    }
+  }, [cpf, record.clientCPF]);
 
   const addItem = (key: 'allergies' | 'medications' | 'previousProcedures' | 'chronicDiseases', value: string) => {
     if (!value.trim()) return;
@@ -40,21 +46,27 @@ export const NewHealthRecordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!record.clientCPF) {
+      alert('CPF do cliente é obrigatório para criar a ficha de saúde.');
+      return;
+    }
     try {
-      await healthRecordService.create(record);
-      navigate(-1);
+      await healthRecordService.create(record.clientCPF, record);
+      navigate('/clients');
     } catch (err) {
       console.error('Erro ao salvar registro de saúde', err);
-      setError('Erro ao salvar registro de saúde');
     } finally {
-      setLoading(false);
     }
   };
 
   return (
     <StandardPage title="Nova Cliente > Nova Ficha de Saúde">
       <form className="form" onSubmit={handleSubmit}>
+        <div className="field">
+          <label>CPF do Cliente</label>
+          <input type="text" value={record.clientCPF} disabled />
+        </div>
+        
         {/* Alergias */}
         <div className="field">
           <label>Alergias</label>

@@ -47,7 +47,7 @@ export const NewClientPage: React.FC = () => {
 
   const navigateToNewHealthRecord = () => {
     if (clientSaved) {
-      navigate(`/health-records/new`); 
+  navigate(`/health-records/new/${clientSaved.cpf}`); 
     }
   };
 
