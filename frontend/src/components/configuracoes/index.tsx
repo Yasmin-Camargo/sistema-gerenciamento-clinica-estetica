@@ -58,32 +58,8 @@ export const SettingsPage: React.FC = () => {
     if (!esthetician) return;
 
     try {
-      // Deleta produtos (usa listagem geral; ajuste de filtro por clínica não disponível no service)
-      const products = await productService.getAllProducts();
-      for (const p of products) {
-        await productService.delete(p.id);
-      }
-
-      // Deleta procedimentos
-      const procedures = await procedureService.getAllProcedimentos();
-      for (const proc of procedures) {
-        await procedureService.delete(proc.name);
-      }
-
-      // Deleta consultas
-      const appointments = await appointmentService.listAll();
-      for (const app of appointments) {
-        await appointmentService.delete(app.esthetician.cpf, app.client.cpf, app.dateTime);
-      }
-
-      // Deleta clientes
-      const clients = await clientService.getAllClients();
-      for (const client of clients) {
-        await clientService.delete(client.cpf);
-      }
-
       await estheticianService.deleteEsthetician(esthetician.cpf);
-
+      window.location.reload();
       setEsthetician(null);
       alert('Clínica removida com sucesso!');
     } catch (error) {
@@ -201,7 +177,7 @@ export const SettingsPage: React.FC = () => {
   const logout = (
     <StandardPage title="">
       <div className="esthetician-header">
-        <h3>Excluir clínica</h3>
+        <h3>Excluir dados da clínica</h3>
         <button
           className="action-button"
           onClick={() => setShowRemoveModal(true)}
