@@ -81,6 +81,30 @@ export const Content = styled.div<ContentProps>`
     cursor: pointer;
   }
 
+  /* Ensure inputs in .filters have same look as .filtros */
+  .filters .react-datepicker-wrapper input{
+    min-width: 300px;
+  }
+
+  .filters input,
+  .filters select {
+    flex: 1 1 200px;
+    min-width: 180px;
+    padding: 0.75rem;
+    border: 1px solid #c87624;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+    color: #401808;
+    transition: border 0.3s;
+  }
+
+  .filters input:focus,
+  .filters select:focus {
+    outline: none;
+    border-color: #a75d16;
+  }
+
   textarea {
     width: 100%;
     height: 100px;

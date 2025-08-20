@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { AppointmentDTO } from '../../../types';
 import { appointmentService } from '../../../services/appointmentService';
-import { formatAppointmentForDisplay, extractDateFromDateTime } from '../../../utils/appointmentUtils';
+import { formatAppointmentForDisplay, mapStatusToBackend } from '../../../utils/appointmentUtils';
 
 export const ConsultasPage: React.FC = () => {
   const navigate = useNavigate();
@@ -68,39 +68,58 @@ export const ConsultasPage: React.FC = () => {
     setModalAberto(false);
   };
 
-  const consultasFiltradas = useMemo(() => {
-    const formattedAppointments = appointments.map(formatAppointmentForDisplay);
-    
-    return formattedAppointments.filter((c) => {
-      const matchBusca =
-        !busca || c.cliente.toLowerCase().includes(busca.toLowerCase());
-      const matchData = !dataFiltro || extractDateFromDateTime(c.original.dateTime) === dataFiltro;
-      const matchProc =
-        !procedimentoFiltro ||
-        c.procedimentos.toLowerCase().includes(procedimentoFiltro.toLowerCase());
-      const matchStatus = !statusFiltro || c.status === statusFiltro;
-      return matchBusca && matchData && matchProc && matchStatus;
-    });
-  }, [busca, dataFiltro, procedimentoFiltro, statusFiltro, appointments]);
+  const consultasFormatadas = useMemo(() => {
+    return appointments.map(formatAppointmentForDisplay);
+  }, [appointments]);
+
+  const handleFiltrar = async () => {
+    try {
+      setLoading(true);
+      const filters: any = {};
+      if (busca.trim()) filters.clientName = busca.trim();
+      if (procedimentoFiltro.trim()) filters.procedureName = procedimentoFiltro.trim();
+      if (statusFiltro) filters.status = mapStatusToBackend(statusFiltro);
+      if (dataFiltro) filters.date = dataFiltro; // YYYY-MM-DD
+
+      const data = await appointmentService.filter(filters);
+      setAppointments(data);
+    } catch (error) {
+      console.error('Erro ao filtrar consultas:', error);
+      setAppointments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLimpar = async () => {
+    setBusca('');
+    setDataFiltro('');
+    setProcedimentoFiltro('');
+    setStatusFiltro('');
+    await loadAppointments();
+  };
 
   const filtros = (
-    <div className="filtros">
+    <div className="filters">
       <input
         placeholder="Busca (cliente)"
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleFiltrar(); }}
       />
 
       <input
         type="date"
         value={dataFiltro}
         onChange={(e) => setDataFiltro(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleFiltrar(); }}
       />
 
       <input
         placeholder="Procedimento"
         value={procedimentoFiltro}
         onChange={(e) => setProcedimentoFiltro(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleFiltrar(); }}
       />
 
       <select
@@ -112,6 +131,13 @@ export const ConsultasPage: React.FC = () => {
         <option value="Concluída">Concluída</option>
         <option value="Cancelada">Cancelada</option>
       </select>
+
+      <button className="btn-submit" type="button" onClick={handleFiltrar}>
+        Filtrar
+      </button>
+      <button className="btn-cancel" type="button" onClick={handleLimpar}>
+        Limpar
+      </button>
     </div>
   );
 
@@ -144,12 +170,12 @@ export const ConsultasPage: React.FC = () => {
               <tr>
                 <td colSpan={7}>Carregando consultas...</td>
               </tr>
-            ) : consultasFiltradas.length === 0 ? (
+            ) : consultasFormatadas.length === 0 ? (
               <tr>
                 <td colSpan={7}>Nenhuma consulta encontrada.</td>
               </tr>
             ) : (
-              consultasFiltradas.map((consulta) => (
+              consultasFormatadas.map((consulta) => (
                 <tr key={`${consulta.original.client.cpf}-${consulta.original.dateTime}`}>
                   <td>{consulta.cliente}</td>
                   <td>{consulta.data}</td>
