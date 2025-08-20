@@ -5,6 +5,7 @@ import com.project.models.AppointmentId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -37,4 +38,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Appoin
     """)
     Double getTotalRevenueFromCompletedAppointments(@Param("status") com.project.models.AppointmentStatus status,
                                                     @Param("estheticianCpf") String estheticianCpf);
+
+    @Modifying
+    @Query("DELETE FROM Appointment a WHERE a.id.estheticianCpf = :estheticianCpf")
+    int deleteByEstheticianCpf(@Param("estheticianCpf") String estheticianCpf);
+
+    @Modifying
+    @Query(value = "DELETE FROM appointment_procedure WHERE esthetician_cpf = :estheticianCpf", nativeQuery = true)
+    int deleteAppointmentProceduresByEstheticianCpf(@Param("estheticianCpf") String estheticianCpf);
 }
