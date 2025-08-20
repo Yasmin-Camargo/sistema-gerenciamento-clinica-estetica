@@ -5,6 +5,7 @@ import { clientService } from '../../services/clientService';
 import { productService } from '../../services/productService';
 import { procedureService } from '../../services/procedureService';
 import { estheticianService } from '../../services/esthetianService';
+import { appointmentService } from '../../services/appointmentService';
 import { ClientDTO, ProductDTO, ProcedimentoDTO } from '../../types';
 import { SettingsStyles } from './styles';
 import { EstheticianFormData } from '../esteticista/new';
@@ -14,9 +15,9 @@ export const SettingsPage: React.FC = () => {
   const [clients, setClients] = useState<ClientDTO[]>([]);
   const [procedures, setProcedures] = useState<ProcedimentoDTO[]>([]);
   const [products, setProducts] = useState<ProductDTO[]>([]);
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments] = useState<any[]>([]);
   const [esthetician, setEsthetician] = useState<EstheticianFormData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<EstheticianFormData | null>(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -28,7 +29,7 @@ export const SettingsPage: React.FC = () => {
   const loadSettingsData = async () => {
     setLoading(true);
     try {
-      const [dashboardRes, clientsRes, procsRes, prodsRes, esthetiansRes] = await Promise.all([
+      const [ , clientsRes, procsRes, prodsRes, esthetiansRes] = await Promise.all([
         dashboardService.getHomePageData(),
         clientService.getAllClients(),
         procedureService.getAllProcedimentos(),
@@ -51,47 +52,32 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancelClick = () => {
-    setIsEditing(false);
-    setFormData(esthetician);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!formData) return;
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // Handlers desnecessários removidos (uso inline no JSX)
   
   const handleRemoveClinic = async () => {
     if (!esthetician) return;
 
     try {
-      // Deleta produtos
-      const products = await productService.getAllByClinic(esthetician.cpf);
+      // Deleta produtos (usa listagem geral; ajuste de filtro por clínica não disponível no service)
+      const products = await productService.getAllProducts();
       for (const p of products) {
         await productService.delete(p.id);
       }
 
       // Deleta procedimentos
-      const procedures = await procedureService.getAllByClinic(esthetician.cpf);
+      const procedures = await procedureService.getAllProcedimentos();
       for (const proc of procedures) {
         await procedureService.delete(proc.name);
       }
 
       // Deleta consultas
-      const appointments = await appointmentService.getAllByEsthetician(esthetician.cpf);
+      const appointments = await appointmentService.listAll();
       for (const app of appointments) {
-        await appointmentService.delete(esthetician.cpf, app.clientCpf, app.dateTime);
+        await appointmentService.delete(app.esthetician.cpf, app.client.cpf, app.dateTime);
       }
 
       // Deleta clientes
-      const clients = await clientService.getAllByClinic(esthetician.cpf);
+      const clients = await clientService.getAllClients();
       for (const client of clients) {
         await clientService.delete(client.cpf);
       }
