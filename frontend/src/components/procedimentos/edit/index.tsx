@@ -72,9 +72,9 @@ export const EditProcedurePage: React.FC = () => {
             type="text"
             name="name"
             value={formData.name}
-            onChange={handleChange}
-            placeholder="Nome do procedimento"
-            required
+            disabled
+            style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+            title="O nome do procedimento não pode ser alterado pois é a chave primária"
           />
         </div>
 

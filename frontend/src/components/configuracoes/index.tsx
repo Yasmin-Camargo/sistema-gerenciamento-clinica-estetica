@@ -159,6 +159,9 @@ export const SettingsPage: React.FC = () => {
                 setFormData({ ...formData, [e.target.name]: e.target.value })
               }
               placeholder={fieldLabels[key] || key}
+              disabled={key === 'cpf'}
+              style={key === 'cpf' ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
+              title={key === 'cpf' ? 'O CPF não pode ser alterado pois é a chave primária' : ''}
             />
           </div>
         ))}
