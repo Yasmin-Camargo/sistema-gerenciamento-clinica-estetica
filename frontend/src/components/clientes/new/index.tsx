@@ -137,13 +137,15 @@ export const NewClientPage: React.FC = () => {
         </div>
       </form>
 
-      {clientSaved && (
+    {clientSaved && (
+      <div className="new-health-record-container">
         <div className="new-health-record">
-          <button className="btn-submit" onClick={navigateToNewHealthRecord}>
+          <button onClick={navigateToNewHealthRecord}>
             + Nova Ficha de Saúde
           </button>
         </div>
-      )}
+      </div>
+    )}  
     </StandardPage>
   );
 };

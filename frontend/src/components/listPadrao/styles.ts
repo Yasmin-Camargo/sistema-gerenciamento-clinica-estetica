@@ -201,20 +201,29 @@ export const Content = styled.div<ContentProps>`
     cursor: pointer;
   }
 
-  .new-health-record {
-  background-color: #401808;
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+.new-health-record-container {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ccc; 
+  display: flex;
+}
 
-  .new-health-record:hover {
-    background-color: #a75d16;
-  }
+.new-health-record-container .new-health-record button {
+  border: none;
+  padding: 0.6rem 1.2rem;
+  background-color: #f08c42;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 800px;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.new-health-record-container .new-health-record button:hover {
+  background-color: #a75d16;
+}
+
 
   .infos {
     display: flex;
