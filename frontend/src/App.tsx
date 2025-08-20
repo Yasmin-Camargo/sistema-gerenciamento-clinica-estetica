@@ -3,6 +3,7 @@ import { EstheticianForm } from './components/esteticista/new';
 import { StandardPage } from './components/listPadrao';
 import { ConsultasPage } from './components/consultas/list';
 import { NewConsultasPage } from './components/consultas/new';
+import { EditConsultasPage } from './components/consultas/edit';
 import { HomePage } from './components/home';
 import { LoginPage } from './components/esteticista/login';
 import { Logout } from './components/esteticista/logout';
@@ -72,6 +73,11 @@ function App() {
       <Route path="/consultas/new" element={
         <PrivateRoute>
           <NewConsultasPage />
+        </PrivateRoute>
+      } />
+      <Route path="/consultas/:cpf/:dateTime" element={
+        <PrivateRoute>
+          <EditConsultasPage />
         </PrivateRoute>
       } />
       <Route path="/home" element={
