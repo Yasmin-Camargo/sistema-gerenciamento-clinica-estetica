@@ -50,8 +50,26 @@ export const NewHealthRecordPage: React.FC = () => {
       alert('CPF do cliente é obrigatório para criar a ficha de saúde.');
       return;
     }
+    const round2 = (n: number | undefined) => (typeof n === 'number' ? Math.round(n * 100) / 100 : n);
+    const height = round2(record.height || 0) as number;
+    const weight = round2(record.weight || 0) as number;
+    if (height <= 0 || height >= 3) {
+      alert('Altura inválida. Informe em metros (ex.: 1.70) e menor que 3.00.');
+      return;
+    }
+    if (weight <= 0 || weight > 200) {
+      alert('Peso inválido. Informe um valor entre 0.01 kg e 200.00 kg.');
+      return;
+    }
+    const imc = round2(weight / (height * height)) as number;
+    const normalizedRecord: HealthRecordDTO = {
+      ...record,
+      height,
+      weight,
+      imc,
+    };
     try {
-      await healthRecordService.create(record.clientCPF, record);
+      await healthRecordService.create(normalizedRecord.clientCPF, normalizedRecord);
       navigate('/clients');
     } catch (err) {
       console.error('Erro ao salvar registro de saúde', err);
@@ -228,6 +246,8 @@ export const NewHealthRecordPage: React.FC = () => {
           <input
             type="number"
             step="0.1"
+            min={0.01}
+            max={200}
             value={record.weight}
             onChange={e => handleChange('weight', parseFloat(e.target.value))}
             required
