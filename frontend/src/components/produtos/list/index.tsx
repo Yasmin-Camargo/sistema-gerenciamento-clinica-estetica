@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { RemoveModal } from '../../removeModal';
 import { ProductDTO } from '../../../types';
 import { productService } from '../../../services/productService';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 export const ListProductsPage: React.FC = () => {
@@ -41,11 +40,16 @@ export const ListProductsPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await productService.filterProducts(
-        filterName || undefined,
-        filterType || undefined
-      );
-      setProducts(data);
+      // Fallback: filtra no frontend para evitar erro 400 em /products/filter no backend
+      const all = await productService.listAll();
+      const nameTerm = (filterName || '').toLowerCase().trim();
+      const typeTerm = (filterType || '').trim();
+      const filtered = all.filter(p => {
+        const matchName = !nameTerm || p.name.toLowerCase().includes(nameTerm);
+        const matchType = !typeTerm || p.type === typeTerm;
+        return matchName && matchType;
+      });
+      setProducts(filtered);
     } catch (err) {
       setError('Erro ao carregar produtos filtrados.');
       console.error(err);
@@ -109,6 +113,20 @@ export const ListProductsPage: React.FC = () => {
           </option>
         ))}
       </select>
+      <button className="btn-submit" type="button" onClick={fetchProductsFiltered}>
+        Filtrar
+      </button>
+      <button
+        className="btn-cancel"
+        type="button"
+        onClick={() => {
+          setFilterName('');
+          setFilterType('');
+          fetchProducts();
+        }}
+      >
+        Limpar
+      </button>
     </div>
   );
 

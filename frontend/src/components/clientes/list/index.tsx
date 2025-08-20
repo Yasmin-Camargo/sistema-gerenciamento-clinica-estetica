@@ -121,7 +121,7 @@ export const ClientPage: React.FC = () => {
           onChange={(e) => setFilterName(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-      {/* <div>
+      <div>
         <DatePicker
           selectsRange
           startDate={filterDateRange[0]}
@@ -130,9 +130,9 @@ export const ClientPage: React.FC = () => {
           isClearable={true}
           placeholderText="Selecione o intervalo de datas"
           onKeyDown={handleKeyDown}
-          dateFormat="dd-MM-yyyy"
+          dateFormat="yyyy-MM-dd"
         />
-      </div> */}
+      </div>
         <select
           value={filterIsActive}
           onChange={(e) => setFilterIsActive(e.target.value)}
@@ -142,6 +142,22 @@ export const ClientPage: React.FC = () => {
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
         </select>
+        <button className="btn-submit" type="button" onClick={fetchClientsFiltered}>
+          Filtrar
+        </button>
+        <button
+          className="btn-cancel"
+          type="button"
+          onClick={() => {
+            setFilterCpf('');
+            setFilterName('');
+            setFilterDateRange([null, null]);
+            setFilterIsActive('');
+            fetchClients();
+          }}
+        >
+          Limpar
+        </button>
         </div>
     )
 

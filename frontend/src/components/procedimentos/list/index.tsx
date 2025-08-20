@@ -96,6 +96,19 @@ export const ProcedurePage: React.FC = () => {
           if (e.key === 'Enter') handleBusca();
       }}
       />
+      <button className="btn-submit" type="button" onClick={handleBusca}>
+        Filtrar
+      </button>
+      <button
+        className="btn-cancel"
+        type="button"
+        onClick={() => {
+          setBusca('');
+          fetchProcedures();
+        }}
+      >
+        Limpar
+      </button>
     </div>
   );
 

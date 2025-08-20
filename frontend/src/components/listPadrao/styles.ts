@@ -63,6 +63,24 @@ export const Content = styled.div<ContentProps>`
     margin-bottom: 1.5rem;
   }
 
+  .filters .btn-submit {
+    background: #c87624;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .filters .btn-cancel {
+    background: #fff;
+    color: #555;
+    border: 1px solid #c87624;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
   textarea {
     width: 100%;
     height: 100px;
