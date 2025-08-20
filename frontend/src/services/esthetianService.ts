@@ -1,7 +1,7 @@
 import api from "../api/api";
 import { EstheticianFormData } from "../components/esteticista/new";
 
-export const estheticianService = {
+export const  estheticianService = {
   listEstheticians: async (): Promise<EstheticianFormData[]> => {
     const response = await api.get('/estheticians');
     return response.data;

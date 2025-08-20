@@ -8,6 +8,7 @@ import { estheticianService } from '../../services/esthetianService';
 import { ClientDTO, ProductDTO, ProcedimentoDTO } from '../../types';
 import { SettingsStyles } from './styles';
 import { EstheticianFormData } from '../esteticista/new';
+import { RemoveModal } from '../removeModal';
 
 export const SettingsPage: React.FC = () => {
   const [clients, setClients] = useState<ClientDTO[]>([]);
@@ -16,6 +17,9 @@ export const SettingsPage: React.FC = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [esthetician, setEsthetician] = useState<EstheticianFormData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<EstheticianFormData | null>(null);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
 
   useEffect(() => {
     loadSettingsData();
@@ -38,11 +42,67 @@ export const SettingsPage: React.FC = () => {
 
       if (esthetiansRes.length > 0) {
         setEsthetician(esthetiansRes[0]);
+        setFormData(esthetiansRes[0]);
       }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setFormData(esthetician);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!formData) return;
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  
+  const handleRemoveClinic = async () => {
+    if (!esthetician) return;
+
+    try {
+      // Deleta produtos
+      const products = await productService.getAllByClinic(esthetician.cpf);
+      for (const p of products) {
+        await productService.delete(p.id);
+      }
+
+      // Deleta procedimentos
+      const procedures = await procedureService.getAllByClinic(esthetician.cpf);
+      for (const proc of procedures) {
+        await procedureService.delete(proc.name);
+      }
+
+      // Deleta consultas
+      const appointments = await appointmentService.getAllByEsthetician(esthetician.cpf);
+      for (const app of appointments) {
+        await appointmentService.delete(esthetician.cpf, app.clientCpf, app.dateTime);
+      }
+
+      // Deleta clientes
+      const clients = await clientService.getAllByClinic(esthetician.cpf);
+      for (const client of clients) {
+        await clientService.delete(client.cpf);
+      }
+
+      await estheticianService.deleteEsthetician(esthetician.cpf);
+
+      setEsthetician(null);
+      alert('Clínica removida com sucesso!');
+    } catch (error) {
+      console.error('Erro ao remover clínica:', error);
+      alert('Não foi possível remover a clínica.');
     }
   };
 
@@ -62,7 +122,12 @@ export const SettingsPage: React.FC = () => {
 
   const estheticianInfo = esthetician ? (
     <StandardPage title="">
+      <div className="esthetician-header">
       <h3>Informações do Esteticista</h3>
+      <button className="action-button" onClick={() => setIsEditing(true)}>
+        <img src="/IconEdit.png" alt="Editar" />
+      </button>
+      </div>
       <div className="infos">
         {esthetician.name && <p>Nome: {esthetician.name}</p>}
         {esthetician.cpf && <p>CPF: {esthetician.cpf}</p>}
@@ -80,12 +145,96 @@ export const SettingsPage: React.FC = () => {
     </StandardPage>
   ) : null;
 
-    
-    const logout = (
-        <StandardPage title="">
-            <button onClick={() => window.location.href = '/logout'}>Sair</button>
-        </StandardPage>
-    );
+  const fieldLabels: Record<string, string> = {
+    cpf: 'CPF',
+    name: 'Nome',
+    phone: 'Telefone',
+    birthDate: 'Data de Nascimento',
+    email: 'Email',
+    address: 'Endereço',
+    professionalRegistrationNumber: 'Número do Registro Profissional',
+    password: 'Senha',
+    confirmPassword: 'Confirmar Senha',
+    specializations: 'Especializações',
+  };
+
+  const editEsthetician = formData ? (
+    <StandardPage title="">
+      <div className="esthetician-header">
+        <h3>Editando Esteticista</h3>
+      </div>
+      <div className="form">
+        {Object.keys(formData).map((key) => (
+          <div className="field" key={key}>
+            <input
+              name={key}
+              value={(formData as any)[key] || ''}
+              onChange={(e) =>
+                setFormData({ ...formData, [e.target.name]: e.target.value })
+              }
+              placeholder={fieldLabels[key] || key}
+            />
+          </div>
+        ))}
+      <div className="esthetician-buttons actions">
+        <button
+          type="button"
+          className="btn-cancel"
+          onClick={() => {
+            setFormData(esthetician);
+            setIsEditing(false);
+          }}
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          className="btn-submit"
+          onClick={async () => {
+            if (!esthetician || !formData) return;
+            const updated = await estheticianService.updateEsthetician(
+              esthetician.cpf!,
+              formData
+            );
+            setEsthetician(updated);
+            setFormData(updated);
+            setIsEditing(false);
+          }}
+        >
+          Salvar
+        </button>
+      </div>
+      </div>
+    </StandardPage>
+  ) : null;
+
+
+  const logout = (
+    <StandardPage title="">
+      <div className="esthetician-header">
+        <h3>Excluir clínica</h3>
+        <button
+          className="action-button"
+          onClick={() => setShowRemoveModal(true)}
+        >
+          <img src="/IconLixo.png" alt="Excluir clínica" />
+        </button>
+      </div>
+
+      {showRemoveModal && esthetician && (
+        <RemoveModal
+          isOpen={showRemoveModal}
+          onClose={() => setShowRemoveModal(false)}
+          onConfirm={async () => {
+            await handleRemoveClinic();
+            setShowRemoveModal(false);
+          }}
+          title="Excluir clínica"
+          message={`Tem certeza que deseja excluir a clínica de ${esthetician.name}? Esta ação não pode ser desfeita.`}
+        />
+      )}
+    </StandardPage>
+  );
 
 
     return (
@@ -94,7 +243,7 @@ export const SettingsPage: React.FC = () => {
             {clinicInfos}
         </div>
         <div className="settings-page">
-            {estheticianInfo}
+            {isEditing ? editEsthetician : estheticianInfo}
         </div>
         <div className="settings-page">
             {logout}

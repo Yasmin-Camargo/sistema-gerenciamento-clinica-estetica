@@ -34,6 +34,7 @@ export const Content = styled.div<ContentProps>`
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
   }
 
   .title {
@@ -234,4 +235,22 @@ export const Content = styled.div<ContentProps>`
   transition: transform 0.2s ease;
   max-width: 340px;
 }
+
+.esthetician-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.esthetician-header .action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.esthetician-header .action-button img {
+  width: 22px;
+}
+
 `;
