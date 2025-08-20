@@ -68,18 +68,27 @@ export const ProcedurePage: React.FC = () => {
   };
 
   const handleBusca = async () => {
-    if (!busca.trim()) {
+    const termo = busca.trim().toLowerCase();
+    if (!termo) {
       fetchProcedures();
       return;
     }
 
     try {
       setLoading(true);
-      const encontrado = await procedureService.findByName(busca.trim());
-      setProcedimentos([encontrado]);
-    } catch {
+      const todos = await procedureService.listAll();
+      const filtrados = todos.filter((p) => {
+        const byName = p.name?.toLowerCase().includes(termo);
+        const byDesc = p.description?.toLowerCase().includes(termo);
+        const byProduct = Array.isArray(p.products)
+          ? p.products.some((prod) => prod.name?.toLowerCase().includes(termo))
+          : false;
+        return Boolean(byName || byDesc || byProduct);
+      });
+      setProcedimentos(filtrados);
+    } catch (err) {
+      console.error('Erro ao filtrar procedimentos', err);
       setProcedimentos([]);
-      alert('Procedimento não encontrado.');
     } finally {
       setLoading(false);
     }
@@ -87,7 +96,7 @@ export const ProcedurePage: React.FC = () => {
 
 
   const filtros = ( 
-    <div className="filtros">
+    <div className="filters">
       <input
         placeholder="Busca procedimento"
         value={busca}
