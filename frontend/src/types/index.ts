@@ -69,17 +69,19 @@ export interface ProductDTO {
 
 export interface HealthRecordDTO {
   clientCPF: string;
-  allergies?: string[];
-  medications?: string[];
+  allergies?: string;
+  medications?: string;
   bloodType?: string;
-  chronicDiseases?: string[];
+  chronicDiseases?: string;
   skinType?: string; 
   observations?: string;
   height?: number;
   weight?: number;
   imc?: number;
-  previousProcedures?: string[];
+  previousProcedures?: string;
   phototype?: string;
+  // Prefer lastUpdated; offSetDataTime kept for backward compat with older code
+  lastUpdated?: string;
   offSetDataTime?: string;
 }
 

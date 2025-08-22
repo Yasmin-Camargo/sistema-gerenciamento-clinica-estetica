@@ -76,9 +76,6 @@ export const ClientPage: React.FC = () => {
     navigate(`/clients/edit/${client.cpf}`);
   };
 
-  const navigateToHealthRecords = (client: ClientDTO) => {
-    navigate(`/health-records/${client.cpf}`);
-  };
 
   const openRemoveModal = (client: ClientDTO) => {
     setSelectedClient(client);
@@ -203,7 +200,7 @@ export const ClientPage: React.FC = () => {
                   <td className="action-cell">
                     <button
                       className="action-button"
-                      onClick={() => navigateToHealthRecords(client)}
+                      onClick={() => navigate(`/health-records/${client.cpf}`)}
                     >
                       <img src="/IconFicha.png" alt="Ficha de Saúde" />
                     </button>

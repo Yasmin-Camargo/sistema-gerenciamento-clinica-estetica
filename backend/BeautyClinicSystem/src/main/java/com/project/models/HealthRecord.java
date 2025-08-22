@@ -19,23 +19,22 @@ public class HealthRecord {
     @Column(name = "client_cpf")
     private String clientCpf;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String allergies;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String medications;
 
     @Column(name = "blood_type")
     private String bloodType;
 
-    @Lob
-    @Column(name = "chronic_diseases")
+    @Column(name = "chronic_diseases", columnDefinition = "TEXT")
     private String chronicDiseases;
 
     @Column(name = "skin_type")
     private String skinType;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String observations;
 
     private Double height;
@@ -44,8 +43,7 @@ public class HealthRecord {
 
     private Double imc;
 
-    @Lob
-    @Column(name = "previous_procedures")
+    @Column(name = "previous_procedures", columnDefinition = "TEXT")
     private String previousProcedures;
 
     private String phototype;

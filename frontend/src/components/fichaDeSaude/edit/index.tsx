@@ -1,88 +1,139 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { StandardPage } from '../../listPadrao';
 import { healthRecordService } from '../../../services/healthRecordService';
 import { HealthRecordDTO } from '../../../types';
-import { StandardPage } from '../../listPadrao';
 import { notifyError, notifySuccess } from '../../../utils/errorUtils';
+import { RemoveModal } from '../../removeModal';
 
-export const NewHealthRecordPage: React.FC = () => {
+export const EditHealthRecordPage: React.FC = () => {
   const navigate = useNavigate();
   const { cpf } = useParams<{ cpf: string }>();
 
-  const [record, setRecord] = useState<HealthRecordDTO>({
-    clientCPF: cpf ?? '',
-    allergies: '',
-    medications: '',
-    bloodType: '',
-    chronicDiseases: '',
-    skinType: '',
-    observations: '',
-    height: 0,
-    weight: 0,
-    imc: 0,
-    previousProcedures: '',
-    phototype: '',
-  lastUpdated: new Date().toISOString(),
-  });
+  const [record, setRecord] = useState<HealthRecordDTO | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [removeOpen, setRemoveOpen] = useState(false);
 
-  // Sem estados de loading/erro por enquanto; podemos adicionar feedback visual depois.
+  const emptyRecord: HealthRecordDTO = useMemo(
+    () => ({
+      clientCPF: cpf ?? '',
+      allergies: '',
+      medications: '',
+      bloodType: '',
+      chronicDiseases: '',
+      skinType: '',
+      observations: '',
+      height: 0,
+      weight: 0,
+      imc: 0,
+      previousProcedures: '',
+      phototype: '',
+  lastUpdated: new Date().toISOString(),
+    }),
+    [cpf]
+  );
 
   useEffect(() => {
-    if (cpf && cpf !== record.clientCPF) {
-      setRecord(prev => ({ ...prev, clientCPF: cpf }));
-    }
-  }, [cpf, record.clientCPF]);
-
-  // text inputs are controlled; user can separate items with vírgula
+    const fetchRecord = async () => {
+      if (!cpf) {
+        setError('CPF não informado.');
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await healthRecordService.getByClientCPF(cpf);
+        const normalized: HealthRecordDTO = {
+          clientCPF: data.clientCPF || cpf,
+          allergies: (data.allergies || ''),
+          medications: (data.medications || ''),
+          bloodType: data.bloodType || '',
+          chronicDiseases: (data.chronicDiseases || ''),
+          skinType: data.skinType || '',
+          observations: data.observations || '',
+          height: data.height ?? 0,
+          weight: data.weight ?? 0,
+          imc: data.imc ?? 0,
+          previousProcedures: (data.previousProcedures || ''),
+          phototype: data.phototype || '',
+          lastUpdated: (data as any).lastUpdated || data.offSetDataTime || new Date().toISOString(),
+        };
+        setRecord(normalized);
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          // Se não existe, prepara para criar
+          setRecord(emptyRecord);
+        } else {
+          setError('Erro ao carregar ficha de saúde.');
+          notifyError(err, 'Erro ao carregar ficha de saúde.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecord();
+  }, [cpf, emptyRecord]);
 
   const handleChange = (key: keyof HealthRecordDTO, value: any) => {
-    setRecord(prev => ({ ...prev, [key]: value }));
+    setRecord(prev => (prev ? { ...prev, [key]: value } : prev));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // text inputs are controlled; user can separate itens com vírgula
+
+  const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!record.clientCPF) {
-  notifyError(null, 'CPF do cliente é obrigatório para criar a ficha de saúde.');
+    if (!record || !record.clientCPF) {
+      notifyError(null, 'CPF do cliente é obrigatório.');
       return;
     }
     const round2 = (n: number | undefined) => (typeof n === 'number' ? Math.round(n * 100) / 100 : n);
     const height = round2(record.height || 0) as number;
     const weight = round2(record.weight || 0) as number;
     if (height <= 0 || height >= 3) {
-  notifyError(null, 'Altura inválida. Informe em metros (ex.: 1.70) e menor que 3.00.');
+      notifyError(null, 'Altura inválida. Informe em metros (ex.: 1.70) e menor que 3.00.');
       return;
     }
     if (weight <= 0 || weight > 200) {
-  notifyError(null, 'Peso inválido. Informe um valor entre 0.01 kg e 200.00 kg.');
+      notifyError(null, 'Peso inválido. Informe um valor entre 0.01 kg e 200.00 kg.');
       return;
     }
-    const imc = round2(weight / (height * height)) as number;
-    const normalizedRecord: HealthRecordDTO = {
-      ...record,
-      height,
-      weight,
-      imc,
-      lastUpdated: new Date().toISOString(),
-    };
+    const imc = (weight && height) ? round2(weight / (height * height)) as number : 0;
+  const payload: HealthRecordDTO = { ...record, height, weight, imc, lastUpdated: new Date().toISOString() };
     try {
-      await healthRecordService.create(normalizedRecord.clientCPF, normalizedRecord);
+      await healthRecordService.update(payload.clientCPF, payload);
       notifySuccess('Ficha de saúde salva com sucesso!');
       navigate('/clients');
     } catch (err) {
-      notifyError(err, 'Erro ao salvar registro de saúde.');
-    } finally {
+      notifyError(err, 'Erro ao salvar ficha de saúde.');
     }
   };
 
+  const confirmRemove = async () => {
+    if (!cpf) return;
+    try {
+      await healthRecordService.remove(cpf);
+      notifySuccess('Ficha de saúde removida com sucesso!');
+      navigate('/clients');
+    } catch (err) {
+      notifyError(err, 'Erro ao remover ficha de saúde.');
+      throw err; // para o modal exibir erro
+    }
+  };
+
+  if (loading) return <StandardPage title="Ficha de Saúde"><div>Carregando...</div></StandardPage>;
+  if (error) return <StandardPage title="Ficha de Saúde"><div style={{color:'red'}}>{error}</div></StandardPage>;
+  if (!record) return <StandardPage title="Ficha de Saúde"><div>Registro não disponível.</div></StandardPage>;
+
   return (
-    <StandardPage title="Nova Cliente > Nova Ficha de Saúde">
-      <form className="form" onSubmit={handleSubmit}>
+    <StandardPage title={`Cliente ${record.clientCPF} > Ficha de Saúde`}>
+      <form className="form" onSubmit={save}>
         <div className="field">
           <label>CPF do Cliente</label>
           <input type="text" value={record.clientCPF} disabled />
         </div>
-        
-        {/* Alergias */}
+
         <div className="field">
           <label>Alergias</label>
           <input
@@ -93,13 +144,9 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-        {/* Tipo Sanguíneo */}
         <div className="field">
           <label>Tipo Sanguíneo</label>
-          <select
-            value={record.bloodType}
-            onChange={e => handleChange('bloodType', e.target.value)}
-          >
+          <select value={record.bloodType} onChange={e => handleChange('bloodType', e.target.value)}>
             <option value="">Selecione</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
@@ -112,7 +159,6 @@ export const NewHealthRecordPage: React.FC = () => {
           </select>
         </div>
 
-        {/* Medicamentos */}
         <div className="field">
           <label>Medicamentos</label>
           <input
@@ -123,7 +169,6 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-        {/* Doenças Crônicas */}
         <div className="field">
           <label>Doenças Crônicas</label>
           <input
@@ -134,13 +179,9 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-        {/* Tipo de Pele */}
         <div className="field">
           <label>Tipo de Pele</label>
-          <select
-            value={record.skinType}
-            onChange={e => handleChange('skinType', e.target.value)}
-          >
+          <select value={record.skinType} onChange={e => handleChange('skinType', e.target.value)}>
             <option value="">Selecione</option>
             <option value="normal">Normal</option>
             <option value="mista">Mista</option>
@@ -149,8 +190,6 @@ export const NewHealthRecordPage: React.FC = () => {
           </select>
         </div>
 
-        
-        {/* Observações */}
         <div className="field">
           <label>Observações</label>
           <textarea
@@ -160,7 +199,6 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-        {/* Procedimentos Anteriores */}
         <div className="field">
           <label>Procedimentos Anteriores</label>
           <input
@@ -171,13 +209,9 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-               {/* Fototipo */}
         <div className="field">
           <label>Fototipo</label>
-          <select
-            value={record.phototype}
-            onChange={e => handleChange('phototype', e.target.value)}
-          >
+          <select value={record.phototype} onChange={e => handleChange('phototype', e.target.value)}>
             <option value="">Selecione</option>
             <option value="I">I</option>
             <option value="II">II</option>
@@ -188,7 +222,6 @@ export const NewHealthRecordPage: React.FC = () => {
           </select>
         </div>
 
-              {/* Altura */}
         <div className="field">
           <label>Altura (m)*</label>
           <input
@@ -200,7 +233,6 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-        {/* Peso */}
         <div className="field">
           <label>Peso (kg)*</label>
           <input
@@ -214,19 +246,20 @@ export const NewHealthRecordPage: React.FC = () => {
           />
         </div>
 
-           <div className="actions">
-          <button
-            type="button"
-            className="btn-cancel"
-            onClick={() => navigate(-1)}
-          >
-            Cancelar
-          </button>
-          <button type="submit" className="btn-submit">
-            Salvar
-          </button>
+        <div className="actions">
+          <button type="button" className="btn-cancel" onClick={() => navigate(-1)}>Cancelar</button>
+          <button type="button" className="btn-cancel" onClick={() => setRemoveOpen(true)}>Excluir</button>
+          <button type="submit" className="btn-submit">Salvar</button>
         </div>
       </form>
+
+      <RemoveModal
+        isOpen={removeOpen}
+        onClose={() => setRemoveOpen(false)}
+        onConfirm={confirmRemove}
+        title="Excluir Ficha de Saúde"
+        message={`Tem certeza que deseja excluir a ficha do cliente "${record.clientCPF}"?`}
+      />
     </StandardPage>
   );
 };

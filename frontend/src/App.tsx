@@ -19,7 +19,7 @@ import { ListProductsPage } from './components/produtos/list';
 import { EditProductPage } from './components/produtos/edit';
 import { NewProductPage } from './components/produtos/new';
 import { NewHealthRecordPage } from './components/fichaDeSaude/new';
-import { ListHealthRecordPage } from './components/fichaDeSaude/list';
+import { EditHealthRecordPage } from './components/fichaDeSaude/edit/index';
 
 function App() {
   return (
@@ -112,7 +112,7 @@ function App() {
       } />
       <Route path="/health-records/:cpf" element={
         <PrivateRoute>
-          <ListHealthRecordPage />
+          <EditHealthRecordPage />
         </PrivateRoute>
       } />
     </Routes>

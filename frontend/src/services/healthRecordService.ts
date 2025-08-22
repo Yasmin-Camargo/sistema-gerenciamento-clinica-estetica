@@ -17,20 +17,24 @@ type ApiHealthRecordPayload = {
   lastUpdated?: string;
 };
 
+const ensureString = (v: unknown): string =>
+  Array.isArray(v) ? v.map(x => String(x).trim()).filter(Boolean).join(', ') : (v ?? '') as string;
+
 const mapToApiPayload = (record: HealthRecordDTO): ApiHealthRecordPayload => ({
   clientCpf: record.clientCPF || '',
-  allergies: (record.allergies || []).join(', '),
-  medications: (record.medications || []).join(', '),
+  allergies: ensureString(record.allergies),
+  medications: ensureString(record.medications),
   bloodType: record.bloodType,
-  chronicDiseases: (record.chronicDiseases || []).join(', '),
+  chronicDiseases: ensureString(record.chronicDiseases),
   skinType: record.skinType,
   observations: record.observations,
   height: record.height,
   weight: record.weight,
   imc: record.imc,
-  previousProcedures: (record.previousProcedures || []).join(', '),
+  previousProcedures: ensureString(record.previousProcedures),
   phototype: record.phototype,
-  lastUpdated: record.offSetDataTime || new Date().toISOString(),
+  // prefer `lastUpdated` prop; fallback to legacy `offSetDataTime`; else now
+  lastUpdated: (record as any).lastUpdated || record.offSetDataTime || new Date().toISOString(),
 });
 
 export const healthRecordService = {
