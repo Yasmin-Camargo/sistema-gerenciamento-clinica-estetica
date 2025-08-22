@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StandardPage } from '../../listPadrao';  
-import { ClientDTO, HealthRecordDTO } from '../../../types';
-import { clientService } from '../../../services/clientService';
+import { HealthRecordDTO } from '../../../types';
 import { RemoveModal } from '../../removeModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { healthRecordService } from '../../../services/healthRecordService';
+import { notifyError, notifySuccess } from '../../../utils/errorUtils';
 
 export const ListHealthRecordPage: React.FC = () => {
   const { cpf } = useParams<{ cpf: string }>();
@@ -14,23 +14,28 @@ export const ListHealthRecordPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (cpf) fetchRecord(cpf);
-  }, [cpf]);
-
-  const fetchRecord = async (cpf: string) => {
+  const fetchRecord = useCallback(async (cpf: string) => {
     setLoading(true);
     setError(null);
     try {
       const data = await healthRecordService.getByClientCPF(cpf);
       setRecord(data);
     } catch (err) {
+      const status = (err as any)?.response?.status;
+      if (status === 404) {
+        navigate(`/health-records/new/${cpf}`);
+        return;
+      }
       setError('Erro ao carregar a ficha de saúde.');
-      console.error(err);
+      notifyError(err, 'Erro ao carregar a ficha de saúde.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (cpf) fetchRecord(cpf);
+  }, [cpf, fetchRecord]);
 
   const openRemoveModal = () => {
     setModalOpen(true);
@@ -40,11 +45,10 @@ export const ListHealthRecordPage: React.FC = () => {
     if (!cpf) return;
     try {
       await healthRecordService.remove(cpf);
-      alert('Ficha de saúde removida com sucesso!');
-      navigate(-1); // volta para a página anterior
+  notifySuccess('Ficha de saúde removida com sucesso!');
+      navigate(-1);
     } catch (err) {
-      alert('Erro ao remover a ficha de saúde.');
-      console.error(err);
+  notifyError(err, 'Erro ao remover a ficha de saúde.');
     } finally {
       setModalOpen(false);
     }
